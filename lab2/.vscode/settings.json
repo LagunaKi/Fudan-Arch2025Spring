@@ -1,0 +1,11 @@
+{
+    "files.associations": {
+        "*.h": "c",
+        "mutex": "cpp",
+        "array": "cpp",
+        "string": "cpp",
+        "string_view": "cpp",
+        "initializer_list": "cpp",
+        "utility": "cpp"
+    }
+}
