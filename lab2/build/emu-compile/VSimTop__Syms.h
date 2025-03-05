@@ -35,6 +35,7 @@ class VSimTop__Syms final : public VerilatedSyms {
     // SCOPE NAMES
     VerilatedScope __Vscope_SimTop__core__decode__decoder;
     VerilatedScope __Vscope_SimTop__core__execute;
+    VerilatedScope __Vscope_SimTop__core__memory;
     VerilatedScope __Vscope_SimTop__ram;
 
     // CONSTRUCTORS

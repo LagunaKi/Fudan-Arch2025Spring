@@ -7,13 +7,18 @@
 module reg_DE 
 import common::*;
 (
-    input    logic            clk, reset,
+    input    u1            clk, reset, stalldata,
     input    decode_data_t    dataD_in,
     output   decode_data_t    dataD_out
 );
 
     always_ff @(posedge clk) begin
+        if(stalldata)begin
+            dataD_out <= dataD_out;
+        end
+        else begin
             dataD_out <= dataD_in;
+        end
     end
 endmodule
 

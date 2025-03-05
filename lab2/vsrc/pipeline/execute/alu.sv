@@ -29,6 +29,10 @@ module alu
 			ALU_XOR: begin 
 			    result = a ^ b; 
 			end
+			ALU_DIRECT: begin
+			    result = a; 
+			end
+			
 			default: begin
 				result = '0;
 			end

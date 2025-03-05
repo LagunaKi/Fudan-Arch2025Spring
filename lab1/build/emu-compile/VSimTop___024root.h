@@ -57,13 +57,13 @@ VL_MODULE(VSimTop___024root) {
     VlWide<5>/*150:0*/ SimTop__DOT__icreq;
     VlWide<5>/*150:0*/ SimTop__DOT__dcreq;
     QData/*63:0*/ SimTop__DOT__core__DOT__pc;
-    VlWide<4>/*96:0*/ SimTop__DOT__core__DOT__dataF_next;
+    VlWide<4>/*96:0*/ SimTop__DOT__core__DOT__dataF_nxt;
     VlWide<11>/*341:0*/ SimTop__DOT__core__DOT__dataD;
-    VlWide<11>/*341:0*/ SimTop__DOT__core__DOT__dataD_next;
+    VlWide<11>/*341:0*/ SimTop__DOT__core__DOT__dataD_nxt;
     VlWide<7>/*213:0*/ SimTop__DOT__core__DOT__dataE;
-    VlWide<7>/*213:0*/ SimTop__DOT__core__DOT__dataE_next;
+    VlWide<7>/*213:0*/ SimTop__DOT__core__DOT__dataE_nxt;
     VlWide<7>/*213:0*/ SimTop__DOT__core__DOT__dataM;
-    VlWide<7>/*213:0*/ SimTop__DOT__core__DOT__dataM_next;
+    VlWide<7>/*213:0*/ SimTop__DOT__core__DOT__dataM_nxt;
     VlWide<7>/*213:0*/ SimTop__DOT__core__DOT__dataW;
     QData/*63:0*/ SimTop__DOT__core__DOT__execute__DOT__alu_a;
     QData/*63:0*/ SimTop__DOT__core__DOT__execute__DOT__alu_b;

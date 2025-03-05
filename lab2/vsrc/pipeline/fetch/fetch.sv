@@ -10,7 +10,6 @@ module fetch
         
     input u32 raw_instr,
     input u64 pc,
-    input fetch_data_t dataF_next,
     output fetch_data_t dataF,
     input logic ivalid
 );

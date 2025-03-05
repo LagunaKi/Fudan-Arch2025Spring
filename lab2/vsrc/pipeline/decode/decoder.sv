@@ -135,6 +135,98 @@ module decoder
                     default:begin end
                 endcase
             end
+
+            
+
+
+            F7_LD:begin
+                unique case(f3)
+                    F3_LD:begin
+                        ctl.op = LD;
+                        ctl.regwrite = 1'b1;
+                        ctl.alufunc = ALU_NOP;
+                        ctl.memwrite = 1'b1;
+                    end
+                    F3_LB:begin
+                        ctl.op = LB;
+                        ctl.regwrite = 1'b1;
+                        ctl.alufunc = ALU_NOP;
+                        ctl.memwrite = 1'b1;
+                    end
+                    F3_LH:begin
+                        ctl.op = LH;
+                        ctl.regwrite = 1'b1;
+                        ctl.alufunc = ALU_NOP;
+                        ctl.memwrite = 1'b1;
+                    end
+                    F3_LW:begin
+                        ctl.op = LW;
+                        ctl.regwrite = 1'b1;
+                        ctl.alufunc = ALU_NOP;
+                        ctl.memwrite = 1'b1;
+                    end
+                    F3_LBU:begin
+                        ctl.op = LBU;
+                        ctl.regwrite = 1'b1;
+                        ctl.alufunc = ALU_NOP;
+                        ctl.memwrite = 1'b1;
+                    end
+                    F3_LHU:begin
+                        ctl.op = LHU;
+                        ctl.regwrite = 1'b1;
+                        ctl.alufunc = ALU_NOP;
+                        ctl.memwrite = 1'b1;
+                    end
+                    F3_LWU:begin
+                        ctl.op = LWU;
+                        ctl.regwrite = 1'b1;
+                        ctl.alufunc = ALU_NOP;
+                        ctl.memwrite = 1'b1;
+                    end
+                    default:begin end
+                endcase
+            end
+
+            F7_SD:begin
+                unique case(f3)
+                    F3_SD:begin
+                        ctl.op = SD;
+                        ctl.regwrite = 1'b0;
+                        ctl.alufunc = ALU_DIRECT;
+                        ctl.memwrite = 1'b1;
+                    end
+                    F3_SB:begin
+                        ctl.op = SB;
+                        ctl.regwrite = 1'b0;
+                        ctl.alufunc = ALU_DIRECT;
+                        ctl.memwrite = 1'b1;
+                    end
+                    F3_SH:begin
+                        ctl.op = SH;
+                        ctl.regwrite = 1'b0;
+                        ctl.alufunc = ALU_DIRECT;
+                        ctl.memwrite = 1'b1;
+                    end
+                    F3_SW:begin
+                        ctl.op = SW;
+                        ctl.regwrite = 1'b0;
+                        ctl.alufunc = ALU_DIRECT;
+                        ctl.memwrite = 1'b1;
+                    end
+                    default:begin
+                        
+                    end
+                endcase
+            end
+
+            F7_LUI:begin
+                ctl.op = LUI;
+                ctl.regwrite = 1'b1;
+                ctl.alufunc = ALU_DIRECT;
+                ctl.memwrite = 1'b0;
+            end
+
+
             default:begin end
         endcase
     end

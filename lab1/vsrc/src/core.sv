@@ -36,8 +36,19 @@ module core
     logic              handin;
     assign handin = dataW.ctl.regwrite & ~dataW.is_bubble;
 
-    u1 stallpc;
-	assign stallpc = ireq.valid && ~iresp.data_ok;
+	
+
+    fetch_data_t       dataF, dataF_nxt;
+    decode_data_t      dataD, dataD_nxt;
+    execute_data_t     dataE, dataE_nxt;
+    memory_data_t      dataM, dataM_nxt;
+    writeback_data_t   dataW;
+    creg_addr_t        ra1, ra2;
+    word_t             rd1, rd2;
+    u1                 stallpc, stalldata;
+    assign stallpc = ireq.valid & (~iresp.data_ok);
+	assign stalldata = dreq.valid & (~dresp.data_ok);
+
 	always_ff @( posedge clk ) begin
 		if(reset) begin
 			pc <= 64'h8000_0000;
@@ -51,15 +62,6 @@ module core
     assign ireq.valid = 1'b1;
     assign raw_instr = iresp.data;
 
-    fetch_data_t       dataF, dataF_next;
-    decode_data_t      dataD, dataD_next;
-    execute_data_t     dataE, dataE_next;
-    memory_data_t      dataM, dataM_next;
-    writeback_data_t   dataW;
-    creg_addr_t        ra1, ra2;
-    word_t             rd1, rd2;
-    logic              Iwait;
-    assign Iwait = ireq.valid & (~iresp.data_ok);
 
     pcselect pcselect (
 		.pcplus4(pc + 4),
@@ -70,7 +72,6 @@ module core
     fetch fetch (
         .raw_instr      (raw_instr),
         .pc             (pc),
-        .dataF_next     (dataF_next),
         .dataF          (dataF),
         .ivalid         (ireq.valid)
     );
@@ -78,11 +79,11 @@ module core
     reg_FD reg_FD (
         .clk,  .reset ,
         .dataF_in       (dataF),
-        .dataF_out      (dataF_next)
+        .dataF_out      (dataF_nxt)
     );
 
     decode decode (
-        .dataF          (dataF_next),
+        .dataF          (dataF_nxt),
         .dataD          (dataD),
         .ra1            (ra1),
         .ra2            (ra2),
@@ -93,13 +94,13 @@ module core
     reg_DE reg_DE (
         .clk ,.reset ,
         .dataD_in       (dataD),
-        .dataD_out      (dataD_next)
+        .dataD_out      (dataD_nxt)
     );
 
     execute execute (
         .clk            (clk),
         .reset          (reset),
-        .dataD          (dataD_next),
+        .dataD          (dataD_nxt),
         .dataE          (dataE)
     );
 
@@ -107,11 +108,11 @@ module core
         .clk            (clk),
         .reset          (reset),
         .dataE_in       (dataE),
-        .dataE_out      (dataE_next)
+        .dataE_out      (dataE_nxt)
     );
 
     memory memory (
-        .dataE          (dataE_next),
+        .dataE          (dataE_nxt),
         .dresp          (dresp),
         .dreq           (dreq),
         .dataM          (dataM)
@@ -121,11 +122,11 @@ module core
         .clk            (clk),
         .reset          (reset),
         .dataM_in       (dataM),
-        .dataM_out      (dataM_next)
+        .dataM_out      (dataM_nxt)
     );
 
     writeback writeback (
-        .dataM          (dataM_next),
+        .dataM          (dataM_nxt),
         .dataW          (dataW)
     );
 

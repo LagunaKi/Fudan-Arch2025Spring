@@ -15,6 +15,11 @@ module execute
 );
     u64 result;
     word_t alu_a, alu_b;
+    assign dataE.pc = dataD.pc;
+    assign dataE.ctl = dataD.ctl;
+    assign dataE.dst = dataD.dst;
+    assign dataE.mem_addr = dataD.mem_addr;
+    assign dataE.is_bubble = dataD.is_bubble;
 
     always_comb begin
         alu_a = '0;
@@ -68,15 +73,34 @@ module execute
                 alu_a = dataD.srca;
                 alu_b = dataD.srcb;
             end
+
+            LD:begin
+                alu_a = '0;
+                alu_b = '0;
+            end
+            SD:begin
+                alu_a = dataD.srcb;
+                alu_b = '0;
+            end
+            SB:begin
+                alu_a = dataD.srcb;
+                alu_b = '0;
+            end
+            SH:begin
+                alu_a = dataD.srcb;
+                alu_b = '0;
+            end
+            SW:begin
+                alu_a = dataD.srcb;
+                alu_b = '0;
+            end
+
+            
             default:begin
                 alu_a = '0;
                 alu_b = '0;
             end
         endcase
-    end
-
-    always_comb begin
-        dataE.is_bubble = dataD.is_bubble;
     end
  
     alu alu(
@@ -86,10 +110,7 @@ module execute
         .result
     );
 
-    assign dataE.pc = dataD.pc;
-    assign dataE.ctl = dataD.ctl;
-    assign dataE.dst = dataD.dst;
-    assign dataE.memory_address = dataD.memory_address;
+    
 
     always_comb begin
         dataE.result = '0;

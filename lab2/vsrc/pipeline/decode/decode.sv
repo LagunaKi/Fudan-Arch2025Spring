@@ -38,7 +38,45 @@ module decode
 
     assign ra1 = dataF.raw_instr[19:15];
     assign ra2 = dataF.raw_instr[24:20];
-    
-    assign dataD.memory_address = '0;
+
+    always_comb begin
+        dataD.mem_addr = '0;
+        unique case(ctl.op)
+            LD: begin
+                dataD.mem_addr = rd1 + {{52{dataF.raw_instr[31]}}, dataF.raw_instr[31:20] };
+            end
+            LB: begin
+                dataD.mem_addr = rd1 + {{52{dataF.raw_instr[31]}}, dataF.raw_instr[31:20] };
+            end
+            LH: begin
+                dataD.mem_addr = rd1 + {{52{dataF.raw_instr[31]}}, dataF.raw_instr[31:20] };
+            end
+            LW: begin
+                dataD.mem_addr = rd1 + {{52{dataF.raw_instr[31]}}, dataF.raw_instr[31:20] };
+            end
+            LBU: begin
+                dataD.mem_addr = rd1 + {{52{dataF.raw_instr[31]}}, dataF.raw_instr[31:20] };
+            end
+            LHU: begin
+                dataD.mem_addr = rd1 + {{52{dataF.raw_instr[31]}}, dataF.raw_instr[31:20] };
+            end
+            LWU: begin
+                dataD.mem_addr = rd1 + {{52{dataF.raw_instr[31]}}, dataF.raw_instr[31:20] };
+            end
+            SD: begin
+                dataD.mem_addr = rd1 + {{52{dataF.raw_instr[31]}}, dataF.raw_instr[31:25], dataF.raw_instr[11:7] };
+            end
+            SB: begin
+                dataD.mem_addr = rd1 + {{52{dataF.raw_instr[31]}}, dataF.raw_instr[31:25], dataF.raw_instr[11:7] };
+            end
+            SH: begin
+                dataD.mem_addr = rd1 + {{52{dataF.raw_instr[31]}}, dataF.raw_instr[31:25], dataF.raw_instr[11:7] };
+            end
+            SW: begin
+                dataD.mem_addr = rd1 + {{52{dataF.raw_instr[31]}}, dataF.raw_instr[31:25], dataF.raw_instr[11:7] };
+            end
+            default: begin  end
+        endcase
+    end
     
 endmodule

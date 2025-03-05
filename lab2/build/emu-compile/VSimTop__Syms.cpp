@@ -30,6 +30,7 @@ VSimTop__Syms::VSimTop__Syms(VerilatedContext* contextp, const char* namep,VSimT
     // Setup scopes
     __Vscope_SimTop__core__decode__decoder.configure(this, name(), "SimTop.core.decode.decoder", "decoder", -12, VerilatedScope::SCOPE_OTHER);
     __Vscope_SimTop__core__execute.configure(this, name(), "SimTop.core.execute", "execute", -12, VerilatedScope::SCOPE_OTHER);
+    __Vscope_SimTop__core__memory.configure(this, name(), "SimTop.core.memory", "memory", -12, VerilatedScope::SCOPE_OTHER);
     __Vscope_SimTop__ram.configure(this, name(), "SimTop.ram", "ram", -12, VerilatedScope::SCOPE_OTHER);
     // Setup export functions
     for (int __Vfinal=0; __Vfinal<2; __Vfinal++) {

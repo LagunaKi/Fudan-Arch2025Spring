@@ -45,11 +45,14 @@ typedef u32 pc_t;
 
 typedef u7 f7_t;
 typedef u3 f3_t;
-// F7(Head)
+// F7
 parameter F7_ADDI = 7'b0010011;
 parameter F7_ADD = 7'b0110011;
 parameter F7_ADDW = 7'b0111011;
 parameter F7_ADDIW = 7'b0011011;
+parameter F7_LD = 7'b0000011;
+parameter F7_SD = 7'b0100011;
+parameter F7_LUI = 7'b0110111;
 // F3
 parameter F3_ADDI = 3'b000;
 parameter F3_XORI = 3'b100;
@@ -62,7 +65,18 @@ parameter F3_OR = 3'b110;
 parameter F3_XOR = 3'b100;
 parameter F3_ADDIW = 3'b000;
 parameter F3_ADDW = 3'b000;
-// F7(tail)
+parameter F3_LD = 3'b011;
+parameter F3_LB = 3'b000;
+parameter F3_LH = 3'b001;
+parameter F3_LW = 3'b010;
+parameter F3_LBU = 3'b100;
+parameter F3_LHU = 3'b101;
+parameter F3_LWU = 3'b110;
+parameter F3_SD = 3'b011;
+parameter F3_SB = 3'b000;
+parameter F3_SH = 3'b001;
+parameter F3_SW = 3'b010;
+// F7 (at tail)
 parameter F7T_ADD = 7'b0000000;
 parameter F7T_SUB = 7'b0100000;
 parameter F7T_ADDW = 7'b0000000;
@@ -273,14 +287,14 @@ typedef struct packed {
 typedef enum logic[6:0] { 
 	UNKNOWN, ADDI, XORI, ORI, ANDI, 
 	ADD, SUB, AND, OR,
-	XOR, ADDIW, ADDW, SUBW
-
-
+	XOR, ADDIW, ADDW, SUBW,
+	LD, SD, LB, LH, LW, LBU ,LHU, LWU,
+	SB, SH, SW, LUI
  } decode_op_t;
 
 typedef enum logic [6:0] {
 	ALU_UNKNOWN, ALU_ADD, ALU_SUB, ALU_AND, ALU_OR,
-	ALU_XOR
+	ALU_XOR,ALU_DIRECT, ALU_NOP
 } alufunc_t;
 
 typedef enum logic [1:0] {
@@ -309,7 +323,7 @@ typedef struct packed {
 	word_t srca, srcb, immediate;
 	control_t ctl;
 	creg_addr_t dst;
-	word_t memory_address;
+	word_t mem_addr;
 	u64 pc;
 	u1 is_bubble;
 } decode_data_t;
@@ -319,7 +333,7 @@ typedef struct packed {
 	u64 result;
 	control_t ctl;
 	creg_addr_t dst;
-	word_t memory_address;
+	word_t mem_addr;
 	u1 is_bubble;
 
 } execute_data_t;
@@ -329,7 +343,7 @@ typedef struct packed {
 	u64 result;
 	control_t ctl;
 	creg_addr_t dst;
-	word_t memory_address;
+	word_t mem_addr;
 	u1 is_bubble;
 } memory_data_t;
 
@@ -338,7 +352,7 @@ typedef struct packed {
 	u64 result;
 	control_t ctl;
 	creg_addr_t dst;
-	word_t memory_address;
+	word_t mem_addr;
 	u1 is_bubble;
 } writeback_data_t;
 

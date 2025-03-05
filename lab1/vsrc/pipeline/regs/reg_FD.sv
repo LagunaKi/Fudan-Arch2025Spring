@@ -13,8 +13,6 @@ import common::*;
 );
 
     always_ff @(posedge clk) begin
-        dataF_out.raw_instr   <= dataF_in.raw_instr;
-        dataF_out.pc           <= dataF_in.pc;
-        dataF_out.is_bubble    <= dataF_in.is_bubble;
+        dataF_out <= dataF_in;
     end
 endmodule
