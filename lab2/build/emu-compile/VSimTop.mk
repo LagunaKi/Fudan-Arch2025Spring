@@ -4,7 +4,7 @@
 # Execute this makefile from the object directory:
 #    make -f VSimTop.mk
 
-default: /home/tela/Arch2025/lab1/build/emu
+default: /home/tela/Arch2025/lab2/build/emu
 
 ### Constants...
 # Perl executable (from $PERL)
@@ -35,7 +35,7 @@ VM_PREFIX = VSimTop
 VM_MODPREFIX = VSimTop
 # User CFLAGS (from -CFLAGS on Verilator command line)
 VM_USER_CFLAGS = \
-	-g -std=c++2a -static -Wall -I/home/tela/Arch2025/lab1/difftest/src/test/csrc -I/home/tela/Arch2025/lab1/difftest/src/test/csrc/common -I/home/tela/Arch2025/lab1/difftest/src/test/csrc/difftest -DVERILATOR -Wno-maybe-uninitialized  -DNUM_CORES=1 \
+	-g -std=c++2a -static -Wall -I/home/tela/Arch2025/lab2/difftest/src/test/csrc -I/home/tela/Arch2025/lab2/difftest/src/test/csrc/common -I/home/tela/Arch2025/lab2/difftest/src/test/csrc/difftest -DVERILATOR -Wno-maybe-uninitialized  -DNUM_CORES=1 \
 
 # User LDLIBS (from -LDFLAGS on Verilator command line)
 VM_USER_LDLIBS = \
@@ -69,10 +69,10 @@ VM_USER_CLASSES = \
 
 # User .cpp directories (from .cpp's on Verilator command line)
 VM_USER_DIR = \
-	/home/tela/Arch2025/lab1/difftest/src/test/csrc/common \
-	/home/tela/Arch2025/lab1/difftest/src/test/csrc/difftest \
-	/home/tela/Arch2025/lab1/difftest/src/test/csrc/vcs \
-	/home/tela/Arch2025/lab1/difftest/src/test/csrc/verilator \
+	/home/tela/Arch2025/lab2/difftest/src/test/csrc/common \
+	/home/tela/Arch2025/lab2/difftest/src/test/csrc/difftest \
+	/home/tela/Arch2025/lab2/difftest/src/test/csrc/vcs \
+	/home/tela/Arch2025/lab2/difftest/src/test/csrc/verilator \
 
 
 ### Default rules...
@@ -84,53 +84,53 @@ include $(VERILATOR_ROOT)/include/verilated.mk
 ### Executable rules... (from --exe)
 VPATH += $(VM_USER_DIR)
 
-SimJTAG.o: /home/tela/Arch2025/lab1/difftest/src/test/csrc/common/SimJTAG.cpp
+SimJTAG.o: /home/tela/Arch2025/lab2/difftest/src/test/csrc/common/SimJTAG.cpp
 	$(OBJCACHE) $(CXX) $(CXXFLAGS) $(CPPFLAGS) $(OPT_FAST) -c -o $@ $<
-axi4.o: /home/tela/Arch2025/lab1/difftest/src/test/csrc/common/axi4.cpp
+axi4.o: /home/tela/Arch2025/lab2/difftest/src/test/csrc/common/axi4.cpp
 	$(OBJCACHE) $(CXX) $(CXXFLAGS) $(CPPFLAGS) $(OPT_FAST) -c -o $@ $<
-common.o: /home/tela/Arch2025/lab1/difftest/src/test/csrc/common/common.cpp
+common.o: /home/tela/Arch2025/lab2/difftest/src/test/csrc/common/common.cpp
 	$(OBJCACHE) $(CXX) $(CXXFLAGS) $(CPPFLAGS) $(OPT_FAST) -c -o $@ $<
-compress.o: /home/tela/Arch2025/lab1/difftest/src/test/csrc/common/compress.cpp
+compress.o: /home/tela/Arch2025/lab2/difftest/src/test/csrc/common/compress.cpp
 	$(OBJCACHE) $(CXX) $(CXXFLAGS) $(CPPFLAGS) $(OPT_FAST) -c -o $@ $<
-device.o: /home/tela/Arch2025/lab1/difftest/src/test/csrc/common/device.cpp
+device.o: /home/tela/Arch2025/lab2/difftest/src/test/csrc/common/device.cpp
 	$(OBJCACHE) $(CXX) $(CXXFLAGS) $(CPPFLAGS) $(OPT_FAST) -c -o $@ $<
-flash.o: /home/tela/Arch2025/lab1/difftest/src/test/csrc/common/flash.cpp
+flash.o: /home/tela/Arch2025/lab2/difftest/src/test/csrc/common/flash.cpp
 	$(OBJCACHE) $(CXX) $(CXXFLAGS) $(CPPFLAGS) $(OPT_FAST) -c -o $@ $<
-keyboard.o: /home/tela/Arch2025/lab1/difftest/src/test/csrc/common/keyboard.cpp
+keyboard.o: /home/tela/Arch2025/lab2/difftest/src/test/csrc/common/keyboard.cpp
 	$(OBJCACHE) $(CXX) $(CXXFLAGS) $(CPPFLAGS) $(OPT_FAST) -c -o $@ $<
-ram.o: /home/tela/Arch2025/lab1/difftest/src/test/csrc/common/ram.cpp
+ram.o: /home/tela/Arch2025/lab2/difftest/src/test/csrc/common/ram.cpp
 	$(OBJCACHE) $(CXX) $(CXXFLAGS) $(CPPFLAGS) $(OPT_FAST) -c -o $@ $<
-remote_bitbang.o: /home/tela/Arch2025/lab1/difftest/src/test/csrc/common/remote_bitbang.cpp
+remote_bitbang.o: /home/tela/Arch2025/lab2/difftest/src/test/csrc/common/remote_bitbang.cpp
 	$(OBJCACHE) $(CXX) $(CXXFLAGS) $(CPPFLAGS) $(OPT_FAST) -c -o $@ $<
-sdcard.o: /home/tela/Arch2025/lab1/difftest/src/test/csrc/common/sdcard.cpp
+sdcard.o: /home/tela/Arch2025/lab2/difftest/src/test/csrc/common/sdcard.cpp
 	$(OBJCACHE) $(CXX) $(CXXFLAGS) $(CPPFLAGS) $(OPT_FAST) -c -o $@ $<
-uart.o: /home/tela/Arch2025/lab1/difftest/src/test/csrc/common/uart.cpp
+uart.o: /home/tela/Arch2025/lab2/difftest/src/test/csrc/common/uart.cpp
 	$(OBJCACHE) $(CXX) $(CXXFLAGS) $(CPPFLAGS) $(OPT_FAST) -c -o $@ $<
-vga.o: /home/tela/Arch2025/lab1/difftest/src/test/csrc/common/vga.cpp
+vga.o: /home/tela/Arch2025/lab2/difftest/src/test/csrc/common/vga.cpp
 	$(OBJCACHE) $(CXX) $(CXXFLAGS) $(CPPFLAGS) $(OPT_FAST) -c -o $@ $<
-difftest.o: /home/tela/Arch2025/lab1/difftest/src/test/csrc/difftest/difftest.cpp
+difftest.o: /home/tela/Arch2025/lab2/difftest/src/test/csrc/difftest/difftest.cpp
 	$(OBJCACHE) $(CXX) $(CXXFLAGS) $(CPPFLAGS) $(OPT_FAST) -c -o $@ $<
-goldenmem.o: /home/tela/Arch2025/lab1/difftest/src/test/csrc/difftest/goldenmem.cpp
+goldenmem.o: /home/tela/Arch2025/lab2/difftest/src/test/csrc/difftest/goldenmem.cpp
 	$(OBJCACHE) $(CXX) $(CXXFLAGS) $(CPPFLAGS) $(OPT_FAST) -c -o $@ $<
-interface.o: /home/tela/Arch2025/lab1/difftest/src/test/csrc/difftest/interface.cpp
+interface.o: /home/tela/Arch2025/lab2/difftest/src/test/csrc/difftest/interface.cpp
 	$(OBJCACHE) $(CXX) $(CXXFLAGS) $(CPPFLAGS) $(OPT_FAST) -c -o $@ $<
-nemuproxy.o: /home/tela/Arch2025/lab1/difftest/src/test/csrc/difftest/nemuproxy.cpp
+nemuproxy.o: /home/tela/Arch2025/lab2/difftest/src/test/csrc/difftest/nemuproxy.cpp
 	$(OBJCACHE) $(CXX) $(CXXFLAGS) $(CPPFLAGS) $(OPT_FAST) -c -o $@ $<
-ref.o: /home/tela/Arch2025/lab1/difftest/src/test/csrc/difftest/ref.cpp
+ref.o: /home/tela/Arch2025/lab2/difftest/src/test/csrc/difftest/ref.cpp
 	$(OBJCACHE) $(CXX) $(CXXFLAGS) $(CPPFLAGS) $(OPT_FAST) -c -o $@ $<
-spikedasm.o: /home/tela/Arch2025/lab1/difftest/src/test/csrc/difftest/spikedasm.cpp
+spikedasm.o: /home/tela/Arch2025/lab2/difftest/src/test/csrc/difftest/spikedasm.cpp
 	$(OBJCACHE) $(CXX) $(CXXFLAGS) $(CPPFLAGS) $(OPT_FAST) -c -o $@ $<
-main.o: /home/tela/Arch2025/lab1/difftest/src/test/csrc/vcs/main.cpp
+main.o: /home/tela/Arch2025/lab2/difftest/src/test/csrc/vcs/main.cpp
 	$(OBJCACHE) $(CXX) $(CXXFLAGS) $(CPPFLAGS) $(OPT_FAST) -c -o $@ $<
-emu.o: /home/tela/Arch2025/lab1/difftest/src/test/csrc/verilator/emu.cpp
+emu.o: /home/tela/Arch2025/lab2/difftest/src/test/csrc/verilator/emu.cpp
 	$(OBJCACHE) $(CXX) $(CXXFLAGS) $(CPPFLAGS) $(OPT_FAST) -c -o $@ $<
-main.o: /home/tela/Arch2025/lab1/difftest/src/test/csrc/verilator/main.cpp
+main.o: /home/tela/Arch2025/lab2/difftest/src/test/csrc/verilator/main.cpp
 	$(OBJCACHE) $(CXX) $(CXXFLAGS) $(CPPFLAGS) $(OPT_FAST) -c -o $@ $<
-snapshot.o: /home/tela/Arch2025/lab1/difftest/src/test/csrc/verilator/snapshot.cpp
+snapshot.o: /home/tela/Arch2025/lab2/difftest/src/test/csrc/verilator/snapshot.cpp
 	$(OBJCACHE) $(CXX) $(CXXFLAGS) $(CPPFLAGS) $(OPT_FAST) -c -o $@ $<
 
 ### Link rules... (from --exe)
-/home/tela/Arch2025/lab1/build/emu: $(VK_USER_OBJS) $(VK_GLOBAL_OBJS) $(VM_PREFIX)__ALL.a $(VM_HIER_LIBS)
+/home/tela/Arch2025/lab2/build/emu: $(VK_USER_OBJS) $(VK_GLOBAL_OBJS) $(VM_PREFIX)__ALL.a $(VM_HIER_LIBS)
 	$(LINK) $(LDFLAGS) $^ $(LOADLIBES) $(LDLIBS) $(LIBS) $(SC_LIBS) -o $@
 
 

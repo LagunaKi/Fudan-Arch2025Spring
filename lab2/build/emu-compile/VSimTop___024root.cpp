@@ -705,7 +705,7 @@ VL_INLINE_OPT void VSimTop___024root___sequent__TOP__3(VSimTop___024root* vlSelf
                 = vlSelf->SimTop__DOT__oreq[4U];
             __Vdly__SimTop__DOT__ram__DOT__count_down 
                 = (0xffU & ((IData)(2U) + (IData)(VL_MODDIV_III(32, (IData)(
-                                                                            VL_RANDOM_I(32)), (IData)(0U)))));
+                                                                            VL_RANDOM_I(32)), (IData)(0x1fU)))));
             __Vdly__SimTop__DOT__ram__DOT__state = 1U;
         }
     }
@@ -807,7 +807,7 @@ VL_INLINE_OPT void VSimTop___024root___sequent__TOP__3(VSimTop___024root* vlSelf
         if (VL_UNLIKELY(vlSymsp->_vm_contextp__->assertOn())) {
             VL_WRITEF("[%0t] %%Error: execute.sv:96: Assertion failed in %NSimTop.core.execute: synthesis parallel_case, but multiple matches found\n",
                       64,VL_TIME_UNITED_Q(1),-12,vlSymsp->name());
-            VL_STOP_MT("/home/tela/Arch2025/lab1/build/../vsrc/pipeline/execute/execute.sv", 96, "");
+            VL_STOP_MT("/home/tela/Arch2025/lab2/build/../vsrc/pipeline/execute/execute.sv", 96, "");
         }
     }
     vlSelf->SimTop__DOT__core__DOT__dataE[0U] = ((0xfffffffeU 
@@ -1302,7 +1302,7 @@ VL_INLINE_OPT void VSimTop___024root___sequent__TOP__3(VSimTop___024root* vlSelf
                                                       VL_TIME_UNITED_Q(1),
                                                       -12,
                                                       vlSymsp->name());
-                                            VL_STOP_MT("/home/tela/Arch2025/lab1/build/../vsrc/pipeline/decode/decoder.sv", 119, "");
+                                            VL_STOP_MT("/home/tela/Arch2025/lab2/build/../vsrc/pipeline/decode/decoder.sv", 119, "");
                                         }
                                     }
                                 }
@@ -1372,7 +1372,7 @@ VL_INLINE_OPT void VSimTop___024root___sequent__TOP__3(VSimTop___024root* vlSelf
                                                       VL_TIME_UNITED_Q(1),
                                                       -12,
                                                       vlSymsp->name());
-                                            VL_STOP_MT("/home/tela/Arch2025/lab1/build/../vsrc/pipeline/decode/decoder.sv", 53, "");
+                                            VL_STOP_MT("/home/tela/Arch2025/lab2/build/../vsrc/pipeline/decode/decoder.sv", 53, "");
                                         }
                                     }
                                     if ((0U == (0x7fU 
