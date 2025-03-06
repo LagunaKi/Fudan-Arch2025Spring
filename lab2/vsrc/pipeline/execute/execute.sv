@@ -94,7 +94,10 @@ module execute
                 alu_a = dataD.srcb;
                 alu_b = '0;
             end
-
+            LUI:begin
+                alu_a = dataD.immediate;
+                alu_b = '0;
+            end
             
             default:begin
                 alu_a = '0;

@@ -5,13 +5,11 @@
 `endif
 
 module fetch
-    import common::*;
-(
-        
+    import common::*;(
     input u32 raw_instr,
     input u64 pc,
-    output fetch_data_t dataF,
-    input logic ivalid
+    input ibus_req_t ireq,
+    output fetch_data_t dataF
 );
 
 
@@ -19,7 +17,7 @@ module fetch
         dataF.raw_instr = '0;
         dataF.pc = '0;
         dataF.is_bubble = '0;
-        if(ivalid == 0)begin
+        if(ireq.valid == 0)begin
             dataF.raw_instr = raw_instr;
             dataF.pc = pc;
             dataF.is_bubble = 1'b1;

@@ -30,6 +30,9 @@ module decode
     always_comb begin
         dataD.immediate = '0;
         unique case(ctl.op)
+            LUI:begin
+                dataD.immediate = {{32{dataF.raw_instr[31]}}, dataF.raw_instr[31:12], {12{1'b0}} };
+            end
             default: begin
                 dataD.immediate = {{52{dataF.raw_instr[31]}}, dataF.raw_instr[31:20]};
             end

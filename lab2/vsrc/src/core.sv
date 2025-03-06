@@ -34,7 +34,8 @@ module core
     logic [63:0]       pc, pc_nxt;
     logic [31:0]       raw_instr;
     logic              handin;
-    assign handin = dataW.ctl.regwrite & ~dataW.is_bubble;
+
+	assign handin = dataW.ctl.regwrite & ~dataW.is_bubble;
 
 	
 
@@ -49,31 +50,46 @@ module core
     assign stallpc = ireq.valid & (~iresp.data_ok);
 	assign stalldata = dreq.valid & (~dresp.data_ok);
 
-	always_ff @( posedge clk ) begin
-		if(reset) begin
-			pc <= 64'h8000_0000;
-		end else if(stallpc) begin
-			pc <= pc;
-		end else begin
-			pc <= pc_nxt;
-		end
-	end
-    assign ireq.addr = pc;
-    assign ireq.valid = 1'b1;
-    assign raw_instr = iresp.data;
+	always_ff @(posedge clk) begin
+        if (reset) begin
+            pc <= 64'h8000_0000;
+            ireq.addr <= '0;
+            ireq.valid <= '1;
+        end 
+		else begin
+            pc <= pc_nxt;
+            if (ireq.valid == 1'b0) begin
+                ireq.addr <= pc_nxt;
+                ireq.valid <= 1'b1;
+            end 
+			else begin
+                if (iresp.data_ok == 0) begin
+                    ireq.addr <= ireq.addr;
+                    ireq.valid <= ireq.valid;
+                end else begin
+                    ireq.addr <= ireq.addr;
+                    ireq.valid <= 1'b0;
+                end
+            end
+        end
+    end
+
+	always_comb begin
+        raw_instr = (iresp.data_ok == 1) ? iresp.data : '0;
+    end
 
 
     pcselect pcselect (
+		.pc, .stalldata, .stallpc, .ireq,
 		.pcplus4(pc + 4),
-		.pc_selected(pc_nxt)
+		.pc_selected(pc_nxt),
+		.bubble(dataD.is_bubble)
 	);
 
 
     fetch fetch (
-        .raw_instr      (raw_instr),
-        .pc             (pc),
-        .dataF          (dataF),
-        .ivalid         (ireq.valid)
+        .raw_instr, .ireq, 
+        .pc, .dataF
     );
 
     reg_FD reg_FD (
@@ -135,7 +151,7 @@ module core
         .ra2            (ra2),
         .rd1            (rd1),
         .rd2            (rd2),
-        .WE             (handin),
+        .WE             (dataW.ctl.regwrite & ~dataW.is_bubble),
         .wa             (dataW.dst),
         .wd             (dataW.result)
     );
