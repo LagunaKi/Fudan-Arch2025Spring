@@ -31,15 +31,14 @@ module core
 
     /* TODO: Add your CPU-Core here. */
 
-    logic [63:0]       pc, pc_nxt;
-    logic [31:0]       raw_instr;
-    logic              handin;
+    u64       pc, pc_nxt;
+    u32       raw_instr;
+    u1              handin;
 
-	assign handin = dataW.ctl.regwrite & ~dataW.is_bubble;
+	//assign handin = dataW.ctl.regwrite & ~dataW.is_bubble;
+	assign handin =~dataM.is_bubble;
 
-	
-
-    fetch_data_t       dataF, dataF_nxt;
+    fetch_data_t       dataF, dataF_nxt, saved_dataF;
     decode_data_t      dataD, dataD_nxt;
     execute_data_t     dataE, dataE_nxt;
     memory_data_t      dataM, dataM_nxt;
@@ -66,7 +65,8 @@ module core
                 if (iresp.data_ok == 0) begin
                     ireq.addr <= ireq.addr;
                     ireq.valid <= ireq.valid;
-                end else begin
+                end 
+				else begin
                     ireq.addr <= ireq.addr;
                     ireq.valid <= 1'b0;
                 end
@@ -93,7 +93,11 @@ module core
     );
 
     reg_FD reg_FD (
-        .clk,  .reset , .stalldata,
+        .clk,  .reset , .ireq,
+		 .stallpc, .stalldata,
+		.saved_dataF_in (saved_dataF),
+		.saved_dataF_out (saved_dataF), 
+		.last_dataF (dataF_nxt),
         .dataF_in       (dataF),
         .dataF_out      (dataF_nxt)
     );

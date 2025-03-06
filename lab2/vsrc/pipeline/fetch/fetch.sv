@@ -12,7 +12,6 @@ module fetch
     output fetch_data_t dataF
 );
 
-
     always_comb begin
         dataF.raw_instr = '0;
         dataF.pc = '0;

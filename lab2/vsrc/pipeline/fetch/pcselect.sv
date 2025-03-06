@@ -19,7 +19,7 @@ module pcselect
     
 );
 always_comb begin
-    if(stalldata || bubble || stallpc || ireq.valid) begin
+    if(stalldata || bubble || stallpc) begin
         pc_selected = pc;
     end
     else begin

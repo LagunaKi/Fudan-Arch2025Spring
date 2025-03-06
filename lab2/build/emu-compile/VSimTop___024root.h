@@ -38,6 +38,7 @@ VL_MODULE(VSimTop___024root) {
     CData/*0:0*/ SimTop__DOT__trint;
     CData/*0:0*/ SimTop__DOT__swint;
     CData/*0:0*/ SimTop__DOT__exint;
+    CData/*0:0*/ SimTop__DOT__core__DOT__stallpc;
     CData/*0:0*/ SimTop__DOT__core__DOT__stalldata;
     CData/*2:0*/ SimTop__DOT__core__DOT__memory__DOT__msize;
     CData/*7:0*/ SimTop__DOT__core__DOT__memory__DOT__strobe;
@@ -49,6 +50,7 @@ VL_MODULE(VSimTop___024root) {
     CData/*3:0*/ SimTop__DOT__ram__DOT__size;
     CData/*0:0*/ SimTop__DOT__ram__DOT__msip;
     SData/*15:0*/ SimTop__DOT__core__DOT__decode__DOT__ctl;
+    IData/*31:0*/ SimTop__DOT__core__DOT__raw_instr;
     IData/*31:0*/ SimTop__DOT__core__DOT__execute__DOT__alu__DOT__half;
     IData/*31:0*/ SimTop__DOT__mux__DOT__index;
     IData/*31:0*/ SimTop__DOT__mux__DOT__select;
@@ -63,7 +65,10 @@ VL_MODULE(VSimTop___024root) {
     VlWide<5>/*150:0*/ SimTop__DOT__icreq;
     VlWide<5>/*150:0*/ SimTop__DOT__dcreq;
     QData/*63:0*/ SimTop__DOT__core__DOT__pc;
+    QData/*63:0*/ SimTop__DOT__core__DOT__pc_nxt;
+    VlWide<4>/*96:0*/ SimTop__DOT__core__DOT__dataF;
     VlWide<4>/*96:0*/ SimTop__DOT__core__DOT__dataF_nxt;
+    VlWide<4>/*96:0*/ SimTop__DOT__core__DOT__saved_dataF;
     VlWide<11>/*341:0*/ SimTop__DOT__core__DOT__dataD;
     VlWide<11>/*341:0*/ SimTop__DOT__core__DOT__dataD_nxt;
     VlWide<7>/*213:0*/ SimTop__DOT__core__DOT__dataE;
@@ -100,7 +105,6 @@ VL_MODULE(VSimTop___024root) {
     IData/*31:0*/ __Vfunc_get_switch__5__Vfuncout;
     VlWide<5>/*131:0*/ SimTop__DOT____Vcellout__mux__iresps;
     VlWide<10>/*301:0*/ SimTop__DOT____Vcellinp__mux__ireqs;
-    QData/*63:0*/ SimTop__DOT__core__DOT____Vcellout__pcselect__pc_selected;
     QData/*63:0*/ SimTop__DOT__core__DOT____Vcellout__regfile__rd1;
     VlWide<3>/*65:0*/ SimTop__DOT__mux__DOT____Vlvbound4;
     QData/*63:0*/ __Vfunc_ram_read_helper__6__Vfuncout;
