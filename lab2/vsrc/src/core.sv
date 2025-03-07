@@ -36,7 +36,7 @@ module core
     u1              handin;
 
 	//assign handin = dataW.ctl.regwrite & ~dataW.is_bubble;
-	assign handin =~dataM.is_bubble;
+	assign handin =~dataW.is_bubble;
 
     fetch_data_t       dataF, dataF_nxt, saved_dataF;
     decode_data_t      dataD, dataD_nxt;
@@ -114,7 +114,8 @@ module core
     reg_DE reg_DE (
         .clk ,.reset , .stalldata,
         .dataD_in       (dataD),
-        .dataD_out      (dataD_nxt)
+        .dataD_out      (dataD_nxt),
+		.last_dataD (dataD_nxt)
     );
 
     execute execute (
@@ -127,7 +128,8 @@ module core
     reg_EM reg_EM (
         .clk, .reset, .stalldata,
         .dataE_in       (dataE),
-        .dataE_out      (dataE_nxt)
+        .dataE_out      (dataE_nxt),
+		.last_dataE (dataE_nxt)
     );
 
     memory memory (
@@ -140,7 +142,8 @@ module core
     reg_MW reg_MW (
         .clk, .reset, .stalldata,
         .dataM_in       (dataM),
-        .dataM_out      (dataM_nxt)
+        .dataM_out      (dataM_nxt),
+		.last_dataM (dataM_nxt)
     );
 
     writeback writeback (

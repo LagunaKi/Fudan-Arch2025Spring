@@ -7,7 +7,7 @@
 module reg_FD 
 import common::*;
 (
-    input      u1            clk, reset, 
+    input      u1                clk, reset, 
     input      ibus_req_t        ireq,
     input      fetch_data_t      dataF_in,
     input      fetch_data_t      saved_dataF_in,

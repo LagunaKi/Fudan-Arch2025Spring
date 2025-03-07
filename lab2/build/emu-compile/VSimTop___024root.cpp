@@ -228,11 +228,11 @@ VL_INLINE_OPT void VSimTop___024root___sequent__TOP__2(VSimTop___024root* vlSelf
                                                                                 << 0x20U) 
                                                                                | (QData)((IData)(
                                                                                 vlSelf->SimTop__DOT__core__DOT__regfile__DOT__regs_nxt[0x3eU]))));
-    if ((1U & (~ vlSelf->SimTop__DOT__core__DOT__dataM[0U]))) {
+    if ((1U & (~ vlSelf->SimTop__DOT__core__DOT__dataW[0U]))) {
         VSimTop___024unit____Vdpiimwrap_v_difftest_InstrCommit_TOP____024unit(0U, 0U, 
                                                                               (1U 
                                                                                & (~ 
-                                                                                vlSelf->SimTop__DOT__core__DOT__dataM[0U])), 
+                                                                                vlSelf->SimTop__DOT__core__DOT__dataW[0U])), 
                                                                               (((QData)((IData)(
                                                                                 vlSelf->SimTop__DOT__core__DOT__dataW[6U])) 
                                                                                 << 0x2aU) 

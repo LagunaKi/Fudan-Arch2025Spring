@@ -9,16 +9,17 @@ module reg_MW
 (
         input logic clk, reset, stalldata,
         input memory_data_t dataM_in,
-        output memory_data_t dataM_out
+        output memory_data_t dataM_out,
+        input memory_data_t last_dataM
 );
 
     always_ff @ (posedge clk)
     begin
         if(stalldata)begin
-            dataM_out.result <= dataM_out.result;
-            dataM_out.pc <= dataM_out.pc;
-            dataM_out.ctl <= dataM_out.ctl;
-            dataM_out.dst <= dataM_out.dst;
+            dataM_out.result <= last_dataM.result;
+            dataM_out.pc <= last_dataM.pc;
+            dataM_out.ctl <= last_dataM.ctl;
+            dataM_out.dst <= last_dataM.dst;
             dataM_out.is_bubble <= 1'b1;
         end
         else begin

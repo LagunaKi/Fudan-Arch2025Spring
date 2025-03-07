@@ -179,7 +179,7 @@ void VSimTop___024root__traceChgSub0(VSimTop___024root* vlSelf, VerilatedFst* tr
             tracep->chgQData(oldp+62,(vlSelf->SimTop__DOT__core__DOT__pc),64);
             tracep->chgQData(oldp+64,(vlSelf->SimTop__DOT__core__DOT__pc_nxt),64);
             tracep->chgIData(oldp+66,(vlSelf->SimTop__DOT__core__DOT__raw_instr),32);
-            tracep->chgBit(oldp+67,((1U & (~ vlSelf->SimTop__DOT__core__DOT__dataM[0U]))));
+            tracep->chgBit(oldp+67,((1U & (~ vlSelf->SimTop__DOT__core__DOT__dataW[0U]))));
             tracep->chgIData(oldp+68,(((vlSelf->SimTop__DOT__core__DOT__dataF[3U] 
                                         << 0x1fU) | 
                                        (vlSelf->SimTop__DOT__core__DOT__dataF[2U] 
