@@ -34,10 +34,6 @@ module core
     u64       pc, pc_nxt;
     u32       raw_instr;
     u1              handin;
-
-	//assign handin = dataW.ctl.regwrite & ~dataW.is_bubble;
-	assign handin =~dataW.is_bubble;
-
     fetch_data_t       dataF, dataF_nxt, saved_dataF;
     decode_data_t      dataD, dataD_nxt;
     execute_data_t     dataE, dataE_nxt;
@@ -45,9 +41,13 @@ module core
     writeback_data_t   dataW;
     creg_addr_t        ra1, ra2;
     word_t             rd1, rd2;
-    u1                 stallpc, stalldata;
+    u1                 stallpc, stalldata, stall, bubble;
+	u1 				   hazard_ra1, hazard_ra2;
     assign stallpc = ireq.valid & (~iresp.data_ok);
 	assign stalldata = dreq.valid & (~dresp.data_ok);
+	assign stall = dataD.stall;
+	assign handin = ~dataW.stall;
+
 
 	always_ff @(posedge clk) begin
         if (reset) begin
@@ -75,15 +75,33 @@ module core
     end
 
 	always_comb begin
-        raw_instr = (iresp.data_ok == 1) ? iresp.data : '0;
+		if(bubble)begin
+			raw_instr = '0;
+		end
+		else begin
+        	raw_instr = (iresp.data_ok == 1) ? iresp.data : '0;
+		end
     end
+
+	// data hazard
+	assign hazard_ra1 = (~stall) && 
+						((~dataE.stall && ra1 == dataE.dst) || 
+						(~dataM.stall && ra1 == dataM.dst) || 
+						(~dataW.stall && ra1 == dataW.dst));
+
+	assign hazard_ra2 = (~stall) && 
+						((~dataE.stall && ra2 == dataE.dst) || 
+						(~dataM.stall && ra2 == dataM.dst) || 
+						(~dataW.stall && ra2 == dataW.dst));
+
+	assign bubble = hazard_ra1 || hazard_ra2;
 
 
     pcselect pcselect (
 		.pc, .stalldata, .stallpc, .ireq,
 		.pcplus4(pc + 4),
 		.pc_selected(pc_nxt),
-		.bubble(dataD.is_bubble)
+		.stall, .bubble
 	);
 
 
@@ -94,12 +112,13 @@ module core
 
     reg_FD reg_FD (
         .clk,  .reset , .ireq,
-		 .stallpc, .stalldata,
+		.stallpc, .stalldata,
 		.saved_dataF_in (saved_dataF),
 		.saved_dataF_out (saved_dataF), 
 		.last_dataF (dataF_nxt),
         .dataF_in       (dataF),
-        .dataF_out      (dataF_nxt)
+        .dataF_out      (dataF_nxt),
+		.bubble
     );
 
     decode decode (
@@ -115,7 +134,8 @@ module core
         .clk ,.reset , .stalldata,
         .dataD_in       (dataD),
         .dataD_out      (dataD_nxt),
-		.last_dataD (dataD_nxt)
+		.last_dataD (dataD_nxt),
+		.bubble
     );
 
     execute execute (
@@ -158,7 +178,7 @@ module core
         .ra2            (ra2),
         .rd1            (rd1),
         .rd2            (rd2),
-        .WE             (dataW.ctl.regwrite & ~dataW.is_bubble),
+        .WE             (dataW.ctl.regwrite & ~dataW.stall),
         .wa             (dataW.dst),
         .wd             (dataW.result)
     );

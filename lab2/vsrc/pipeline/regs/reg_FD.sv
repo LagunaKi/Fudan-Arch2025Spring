@@ -14,7 +14,8 @@ import common::*;
     output     fetch_data_t      saved_dataF_out,
     input      fetch_data_t      last_dataF,
     input      u1                stalldata, stallpc,
-    output     fetch_data_t      dataF_out
+    output     fetch_data_t      dataF_out,
+    input      u1                bubble
 );
 
     always_ff @(posedge clk) begin
@@ -22,12 +23,12 @@ import common::*;
         if(stallpc || stalldata || (~ireq.valid && last_dataF.raw_instr != 32'h0000_0000)) begin
             dataF_out.raw_instr    <= last_dataF.raw_instr;
             dataF_out.pc           <= last_dataF.pc;
-            dataF_out.is_bubble    <= 1'b1;
+            dataF_out.stall        <= 1'b1;
         end
-        else if(reset || (~ireq.valid && last_dataF.raw_instr == 32'h0000_0000)) begin
+        else if(bubble || reset || (~ireq.valid && last_dataF.raw_instr == 32'h0000_0000)) begin
             dataF_out.raw_instr   <= saved_dataF_in.raw_instr;
-            dataF_out.pc           <= saved_dataF_in.pc;
-            dataF_out.is_bubble    <= 1'b1;
+            dataF_out.pc          <= saved_dataF_in.pc;
+            dataF_out.stall       <= 1'b1;
         end
         else begin
             dataF_out <= dataF_in;

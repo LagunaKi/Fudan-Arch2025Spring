@@ -20,7 +20,7 @@ module reg_MW
             dataM_out.pc <= last_dataM.pc;
             dataM_out.ctl <= last_dataM.ctl;
             dataM_out.dst <= last_dataM.dst;
-            dataM_out.is_bubble <= 1'b1;
+            dataM_out.stall <= 1'b1;
         end
         else begin
             dataM_out <= dataM_in;

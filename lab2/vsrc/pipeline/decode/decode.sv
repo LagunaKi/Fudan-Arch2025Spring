@@ -25,7 +25,7 @@ module decode
     assign dataD.ctl = ctl;
     assign dataD.dst = dataF.raw_instr[11:7];
     assign dataD.pc = dataF.pc;
-    assign dataD.is_bubble = dataF.is_bubble;
+    assign dataD.stall = dataF.stall;
 
     always_comb begin
         dataD.immediate = '0;

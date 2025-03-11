@@ -15,16 +15,16 @@ module fetch
     always_comb begin
         dataF.raw_instr = '0;
         dataF.pc = '0;
-        dataF.is_bubble = '0;
+        dataF.stall = '0;
         if(ireq.valid == 0)begin
             dataF.raw_instr = raw_instr;
             dataF.pc = pc;
-            dataF.is_bubble = 1'b1;
+            dataF.stall = 1'b1;
         end
         else begin
             dataF.raw_instr = raw_instr;
             dataF.pc = pc;
-            dataF.is_bubble = 1'b0;
+            dataF.stall = 1'b0;
         end
     end
     

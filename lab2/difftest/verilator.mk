@@ -80,7 +80,7 @@ ifeq ($(USE_BIN),1)
 EMU_CXXFLAGS += -DUSE_BIN
 endif
 
-DELAY ?= 31
+DELAY ?= 3
 
 BENCHMARK ?= 0
 
@@ -104,7 +104,6 @@ VERILATOR_FLAGS =                   \
 	-y ../vsrc/ram \
 # 	-Wno-STMTDLY \
 # 	-Wno-WIDTH           \
-
 
 EMU_MK := $(BUILD_DIR)/emu-compile/V$(EMU_TOP).mk
 EMU_DEPS := $(EMU_VFILES) $(EMU_CXXFILES)

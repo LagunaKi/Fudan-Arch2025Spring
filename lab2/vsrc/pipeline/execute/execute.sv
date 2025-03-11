@@ -19,7 +19,7 @@ module execute
     assign dataE.ctl = dataD.ctl;
     assign dataE.dst = dataD.dst;
     assign dataE.mem_addr = dataD.mem_addr;
-    assign dataE.is_bubble = dataD.is_bubble;
+    assign dataE.stall = dataD.stall;
 
     always_comb begin
         alu_a = '0;

@@ -11,7 +11,7 @@ module writeback
     input memory_data_t dataM,
     output writeback_data_t dataW
 );
-    assign dataW.is_bubble = dataM.is_bubble;
+    assign dataW.stall = dataM.stall;
     always_comb begin
         dataW.pc = '0;
         dataW.result = '0;

@@ -40,6 +40,7 @@ VL_MODULE(VSimTop___024root) {
     CData/*0:0*/ SimTop__DOT__exint;
     CData/*0:0*/ SimTop__DOT__core__DOT__stallpc;
     CData/*0:0*/ SimTop__DOT__core__DOT__stalldata;
+    CData/*0:0*/ SimTop__DOT__core__DOT__bubble;
     CData/*2:0*/ SimTop__DOT__core__DOT__memory__DOT__msize;
     CData/*7:0*/ SimTop__DOT__core__DOT__memory__DOT__strobe;
     CData/*0:0*/ SimTop__DOT__core__DOT__memory__DOT__isunsigned;
@@ -102,12 +103,12 @@ VL_MODULE(VSimTop___024root) {
     CData/*0:0*/ __Vclklast__TOP__clock;
     VlWide<5>/*150:0*/ SimTop__DOT__mux__DOT____Vxrand2;
     VlWide<5>/*150:0*/ SimTop__DOT__mux__DOT____Vxrand1;
-    IData/*31:0*/ __Vfunc_get_switch__5__Vfuncout;
+    IData/*31:0*/ __Vfunc_get_switch__9__Vfuncout;
     VlWide<5>/*131:0*/ SimTop__DOT____Vcellout__mux__iresps;
     VlWide<10>/*301:0*/ SimTop__DOT____Vcellinp__mux__ireqs;
     QData/*63:0*/ SimTop__DOT__core__DOT____Vcellout__regfile__rd1;
     VlWide<3>/*65:0*/ SimTop__DOT__mux__DOT____Vlvbound4;
-    QData/*63:0*/ __Vfunc_ram_read_helper__6__Vfuncout;
+    QData/*63:0*/ __Vfunc_ram_read_helper__10__Vfuncout;
     VlUnpacked<CData/*0:0*/, 2> __Vm_traceActivity;
 
     // INTERNAL VARIABLES

@@ -2,68 +2,16 @@
 
 import "DPI-C" function int get_switch();
 
-// import "DPI-C" function void ram_write_helper
-// (
-//   input  longint    wIdx,
-//   input  longint    wdata,
-//   input  longint    wmask,
-//   input  bit        wen
-// );
-
-// import "DPI-C" function longint ram_read_helper
-// (
-//   input  bit        en,
-//   input  longint    rIdx
-// );
-
 // latency
-
 `define LATENCY
 `ifndef RANDOMIZE_DELAY
-`define RANDOMIZE_DELAY 31
+/* verilator lint_off REDEFMACRO */
+`define RANDOMIZE_DELAY 3
 `endif
 
-`ifndef BENCHMARK
-`define BENCHMARK 0
-`endif
+`define IDX(addr) (addr > 64'h8000_0000 ? ((addr - 64'h8000_0000) >> 3) : 0)
 
 /* verilator lint_off WIDTH */
-
-module RAMHelper1 import common::*;
-(
-	input logic clk, reset,
-	input ibus_req_t  ireq,
-	output  ibus_resp_t iresp,
-	input dbus_req_t  dreq,
-	output  dbus_resp_t dresp
-);
-	u64 wmask;
-	for (genvar i = 0; i < 8; i++) begin
-		assign wmask[i * 8 + 7 -: 8] = {8{dreq.strobe[i]}};
-	end
-	addr_t iidx, didx;
-	assign iidx = ireq.addr > 64'h8000_0000 ? ((ireq.addr - 64'h8000_0000) >> 3) : 0;
-	assign didx = dreq.addr > 64'h8000_0000 ? ((dreq.addr - 64'h8000_0000) >> 3) : 0;
-	assign iresp.addr_ok = '1;
-	assign iresp.data_ok = '1;
-	assign dresp.addr_ok = '1;
-	assign dresp.data_ok = '1;
-	assign iresp.data = ireq.addr[2] ? (ram_read_helper('1, iidx) >> 32) : (ram_read_helper('1, iidx) & 'hffffffff);
-	assign dresp.data = ram_read_helper('1, didx);
-	always_ff @(posedge clk) begin
-		if (ireq.valid && iidx >= 'h10000000) begin
-			$display("ERROR: Load address %x out of range!\n", ireq.addr);
-			$finish;
-		end
-		// if (dreq.valid && didx >= 'h10000000) begin
-		// 	$display("Memory address %x out of range!", dreq.addr);
-		// 	$finish;
-		// end
-		if (dreq.valid && dreq.strobe != 0) begin
-			ram_write_helper(didx, dreq.data, wmask, '1);
-		end
-	end
-endmodule
 
 module RAMHelper2 import common::*;
 (
@@ -72,14 +20,26 @@ module RAMHelper2 import common::*;
 	output  cbus_resp_t oresp,
 	output logic trint, swint, exint
 );
-	
+
+task automatic check_req_modification(cbus_req_t req, cbus_req_t saved_req);
+	if (req.valid != saved_req.valid || 
+		req.is_write != saved_req.is_write ||
+		req.size != saved_req.size ||
+		req.addr != saved_req.addr ||
+		req.len != saved_req.len ||
+		req.burst != saved_req.burst) begin
+		$display("ERROR: Unexpected CBus request modification.\n");
+		$finish();
+	end
+endtask
+
 	cbus_req_t saved_oreq;
 	enum i2 {NONE, WAIT, READ, WRITE} state;
 	i8 count_down;
 	i4 size;
 	addr_t addr, idx, wrap1, wrap2;
 	longint cyc_cnt, ms_cnt;
-	assign idx = addr > 64'h8000_0000 ? ((addr - 64'h8000_0000) >> 3) : 0;
+	assign idx = `IDX(addr);
 	u64 wmask;
 	for (genvar i = 0; i < 8; i++) begin
 		assign wmask[i * 8 + 7 -: 8] = {8{oreq.strobe[i]}};
@@ -94,64 +54,49 @@ module RAMHelper2 import common::*;
 				ms_cnt <= ms_cnt + 1;
 				mtime <= mtime + 1;
 				cyc_cnt <= 0;
-			end else
+			end else begin
 				cyc_cnt <= cyc_cnt + 1;
+			end
 			trint <= mtime > mtimecmp;
 			swint <= msip;
 			unique case (state)
 			NONE: begin
 				if (oreq.valid) begin
 					saved_oreq <= oreq;
-					`ifdef LATENCY
-					if (`BENCHMARK) count_down <= 1000; else
-					count_down <= ({$random()} % `RANDOMIZE_DELAY) + 2;
-					state <= WAIT;
-					`else
-					state <= oreq.is_write ? WRITE : READ;
-					addr <= oreq.addr;
-					count_down <= oreq.len;
-					size <= 1 << oreq.size;
-					if ((oreq.addr & ((1 << oreq.size) - 1)) != 0) begin
-						$display("ERROR: Memory address misaligned.\n");
-						$finish();
-					end
-					unique case (oreq.burst)
-					AXI_BURST_FIXED: begin
-						wrap1 <= oreq.addr;
-						wrap2 <= oreq.addr + (1 << oreq.size);
-					end
-					AXI_BURST_WRAP: begin
-						wrap1 <= oreq.addr & ~(((64'(oreq.len) + 1) << oreq.size) - 1);
-						wrap2 <= (oreq.addr & ~(((64'(oreq.len) + 1) << oreq.size) - 1)) + ((64'(oreq.len) + 1) << oreq.size);
-					end
-					default: {wrap1, wrap2} <= '0;
-					endcase
-					`endif
+					if (count_down == 0) begin
+						if (oreq.is_write) begin
+							unique case (oreq.addr)
+							64'h40600004: if (oreq.strobe[4]) begin
+								$fwrite(32'h8000_0001, "%c", oreq.data[39:32]); // stdout
+								$fflush(32'h8000_0001);
+							end
+							64'h23333000: if (oreq.data == 64'h233 && oreq.strobe == '1) $display("Pass!");
+							64'h38000000: msip <= oreq.data[0];
+							64'h38004000: mtimecmp <= oreq.data;
+							64'h3800bff8: mtime <= oreq.data;
+							default: if (addr != 64'h4060000c) ram_write_helper(`IDX(oreq.addr), oreq.data, wmask, '1);
+							endcase
+							count_down <= {$random()} % `RANDOMIZE_DELAY;
+						end else begin
+							if (`IDX(oreq.addr) >= 'h10000000) begin
+								$display("ERROR: Load address %x out of range!\n", oreq.addr);
+								$finish;
+							end
+							count_down <= {$random()} % `RANDOMIZE_DELAY;
+						end
+					end else begin
+						count_down <= count_down - 1;
+						state <= WAIT;
+					end				
 				end
 			end
 			WAIT: begin
-				// if (oreq != saved_oreq) begin
-				// 	$display("ERROR: Unexpected CBus request modification.\n");
-				// 	$finish();
-				// end
-				if (oreq.valid != saved_oreq.valid || 
-					oreq.is_write != saved_oreq.is_write ||
-					oreq.size != saved_oreq.size ||
-					oreq.addr != saved_oreq.addr ||
-					oreq.len != saved_oreq.len ||
-					oreq.burst != saved_oreq.burst) begin
-					$display("ERROR: Unexpected CBus request modification.\n");
-					$finish();
-				end
+				check_req_modification(oreq, saved_oreq);
 				unique if (count_down == 0) begin
 					state <= oreq.is_write ? WRITE : READ;
 					addr <= oreq.addr;
 					count_down <= oreq.len;
 					size <= 1 << oreq.size;
-					// if ((oreq.addr & ((1 << oreq.size) - 1)) != 0) begin
-					// 	$display("Memory address misaligned.\n");
-					// 	$finish();
-					// end
 					unique case (oreq.burst)
 					AXI_BURST_FIXED: begin
 						wrap1 <= oreq.addr;
@@ -167,42 +112,21 @@ module RAMHelper2 import common::*;
 					count_down <= count_down - 1;
 			end
 			READ: begin
-				if (oreq.valid != saved_oreq.valid || 
-					oreq.is_write != saved_oreq.is_write ||
-					oreq.size != saved_oreq.size ||
-					oreq.addr != saved_oreq.addr ||
-					oreq.len != saved_oreq.len ||
-					oreq.burst != saved_oreq.burst) begin
-					$display("ERROR: Unexpected CBus request modification.\n");
-					$finish();
-				end
-				// $display("\tread: %x %x", addr, oresp.data);
+				check_req_modification(oreq, saved_oreq);
 				if (idx >= 'h10000000) begin
 					$display("ERROR: Load address %x out of range!\n", addr);
 					$finish;
 				end
-				unique if (oresp.last)
+				unique if (oresp.last) begin
 					state <= NONE;
-				else begin
+					count_down <= {$random()} % `RANDOMIZE_DELAY;
+				end else begin
 					count_down <= count_down - 1;
 					addr <= (addr + size == wrap2) ? wrap1 : addr + size;
 				end
 			end
 			WRITE: begin
-				if (oreq.valid != saved_oreq.valid || 
-					oreq.is_write != saved_oreq.is_write ||
-					oreq.size != saved_oreq.size ||
-					oreq.addr != saved_oreq.addr ||
-					oreq.len != saved_oreq.len ||
-					oreq.burst != saved_oreq.burst) begin
-					$display("ERROR: Unexpected CBus request modification.\n");
-					$finish();
-				end
-				// $display("\twrite: %x %x %b", addr, oreq.data, oreq.strobe);
-				// if (idx >= 'h10000000) begin
-				// 	$display("Memory address %x out of range!", addr);
-				// 	$finish;
-				// end
+				check_req_modification(oreq, saved_oreq);
 				unique case (addr)
 				64'h40600004: if (oreq.strobe[4]) begin
 					$fwrite(32'h8000_0001, "%c", oreq.data[39:32]); // stdout
@@ -214,16 +138,18 @@ module RAMHelper2 import common::*;
 				64'h3800bff8: mtime <= oreq.data;
 				default: if (addr != 64'h4060000c) ram_write_helper(idx, oreq.data, wmask, '1);
 				endcase
-				unique if (oresp.last)
+				unique if (oresp.last) begin
 					state <= NONE;
-				else begin
+					count_down <= {$random()} % `RANDOMIZE_DELAY;
+				end else begin
 					count_down <= count_down - 1;
 					addr <= addr + size;
 				end
 			end
 			endcase
 		end else begin
-			{state, count_down, cyc_cnt, ms_cnt, addr, size, saved_oreq} <= '0;
+			{state, cyc_cnt, ms_cnt, addr, size, saved_oreq} <= '0;
+			count_down <= {$random()} % `RANDOMIZE_DELAY;
 			mtime <= '0;
 			mtimecmp <= '1;
 			msip <= '0;
@@ -233,19 +159,19 @@ module RAMHelper2 import common::*;
 
 	always_comb begin
 		oresp = '0;
-		unique if (state == READ) begin
+		unique if (state == READ || (state == NONE && oreq.valid && count_down == 0 && ~oreq.is_write)) begin
 			oresp.ready = '1;
 			oresp.last = count_down == 0;
-			unique case (addr)
+			unique case (oreq.addr)
 			64'h40600008: oresp.data = '0;
 			64'h38000000: oresp.data = {63'b0, msip};
 			64'h38004000: oresp.data = mtimecmp;
 			64'h3800bff8: oresp.data = mtime;
 			64'h20003000: oresp.data = ms_cnt;
-			64'h23333008: oresp.data = {'0, get_switch()}; // switch
-			default: oresp.data = ram_read_helper('1, idx);
+			64'h23333008: oresp.data = {'0, get_switch()};
+			default: oresp.data = ram_read_helper('1, `IDX(oreq.addr));
 			endcase
-		end else if (state == WRITE) begin
+		end else if (state == WRITE || (state == NONE && oreq.valid && count_down == 0 && oreq.is_write)) begin
 			oresp.ready = '1;
 			oresp.last = count_down == 0;
 		end else

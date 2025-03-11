@@ -15,7 +15,7 @@ module memory
 
     msize_t msize;
     assign dreq.size = msize;
-    assign dataM.is_bubble = dataE.is_bubble;
+    assign dataM.stall = dataE.stall;
 
     strobe_t strobe;
     u1 isunsigned;
@@ -36,7 +36,7 @@ module memory
                 dataM.dst = dataE.dst;
                 dataM.mem_addr = dataE.mem_addr;
 
-                dreq.valid = 1'b1 & ~dataE.is_bubble;
+                dreq.valid = 1'b1 & ~dataE.stall;
                 dreq.addr = dataE.mem_addr;
                 msize = MSIZE8;
                 dreq.strobe = strobe;
@@ -50,7 +50,7 @@ module memory
                 dataM.dst = dataE.dst;
                 dataM.mem_addr = dataE.mem_addr;
 
-                dreq.valid = 1'b1 & ~dataE.is_bubble;
+                dreq.valid = 1'b1 & ~dataE.stall;
                 dreq.addr = dataE.mem_addr;
                 msize = MSIZE1;
                 dreq.strobe = strobe;
@@ -64,7 +64,7 @@ module memory
                 dataM.dst = dataE.dst;
                 dataM.mem_addr = dataE.mem_addr;
 
-                dreq.valid = 1'b1 & ~dataE.is_bubble;
+                dreq.valid = 1'b1 & ~dataE.stall;
                 dreq.addr = dataE.mem_addr;
                 msize = MSIZE2;
                 dreq.strobe = strobe;
@@ -78,7 +78,7 @@ module memory
                 dataM.dst = dataE.dst;
                 dataM.mem_addr = dataE.mem_addr;
 
-                dreq.valid = 1'b1 & ~dataE.is_bubble;
+                dreq.valid = 1'b1 & ~dataE.stall;
                 dreq.addr = dataE.mem_addr;
                 msize = MSIZE4;
                 dreq.strobe = strobe;
@@ -93,7 +93,7 @@ module memory
                 dataM.dst = dataE.dst;
                 dataM.mem_addr = dataE.mem_addr;
 
-                dreq.valid = 1'b1 & ~dataE.is_bubble;
+                dreq.valid = 1'b1 & ~dataE.stall;
                 dreq.addr = dataE.mem_addr;
                 msize = MSIZE8;
                 dreq.strobe = 8'b0000_0000;
@@ -107,7 +107,7 @@ module memory
                 dataM.dst = dataE.dst;
                 dataM.mem_addr = dataE.mem_addr;
 
-                dreq.valid = 1'b1 & ~dataE.is_bubble;
+                dreq.valid = 1'b1 & ~dataE.stall;
                 dreq.addr = dataE.mem_addr;
                 msize = MSIZE1;
                 dreq.strobe = 8'b0000_0000;
@@ -121,7 +121,7 @@ module memory
                 dataM.dst = dataE.dst;
                 dataM.mem_addr = dataE.mem_addr;
 
-                dreq.valid = 1'b1 & ~dataE.is_bubble;
+                dreq.valid = 1'b1 & ~dataE.stall;
                 dreq.addr = dataE.mem_addr;
                 msize = MSIZE2;
                 dreq.strobe = 8'b0000_0000;
@@ -135,7 +135,7 @@ module memory
                 dataM.dst = dataE.dst;
                 dataM.mem_addr = dataE.mem_addr;
 
-                dreq.valid = 1'b1 & ~dataE.is_bubble;
+                dreq.valid = 1'b1 & ~dataE.stall;
                 dreq.addr = dataE.mem_addr;
                 msize = MSIZE4;
                 dreq.strobe = 8'b0000_0000;
@@ -149,7 +149,7 @@ module memory
                 dataM.dst = dataE.dst;
                 dataM.mem_addr = dataE.mem_addr;
 
-                dreq.valid = 1'b1 & ~dataE.is_bubble;
+                dreq.valid = 1'b1 & ~dataE.stall;
                 dreq.addr = dataE.mem_addr;
                 msize = MSIZE1;
                 dreq.strobe = 8'b0000_0000;
@@ -163,7 +163,7 @@ module memory
                 dataM.dst = dataE.dst;
                 dataM.mem_addr = dataE.mem_addr;
 
-                dreq.valid = 1'b1 & ~dataE.is_bubble;
+                dreq.valid = 1'b1 & ~dataE.stall;
                 dreq.addr = dataE.mem_addr;
                 msize = MSIZE2;
                 dreq.strobe = 8'b0000_0000;
@@ -177,7 +177,7 @@ module memory
                 dataM.dst = dataE.dst;
                 dataM.mem_addr = dataE.mem_addr;
 
-                dreq.valid = 1'b1 & ~dataE.is_bubble;
+                dreq.valid = 1'b1 & ~dataE.stall;
                 dreq.addr = dataE.mem_addr;
                 msize = MSIZE4;
                 dreq.strobe = 8'b0000_0000;

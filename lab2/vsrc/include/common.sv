@@ -309,7 +309,7 @@ typedef enum logic [1:0] {
 typedef struct packed {
 	u32 raw_instr;
 	u64 pc;
-	u1 is_bubble;
+	u1 stall;
 } fetch_data_t;
 
 typedef struct packed {
@@ -325,7 +325,7 @@ typedef struct packed {
 	creg_addr_t dst;
 	word_t mem_addr;
 	u64 pc;
-	u1 is_bubble;
+	u1 stall;
 } decode_data_t;
 
 typedef struct packed {
@@ -334,7 +334,7 @@ typedef struct packed {
 	control_t ctl;
 	creg_addr_t dst;
 	word_t mem_addr;
-	u1 is_bubble;
+	u1 stall;
 
 } execute_data_t;
 
@@ -344,7 +344,7 @@ typedef struct packed {
 	control_t ctl;
 	creg_addr_t dst;
 	word_t mem_addr;
-	u1 is_bubble;
+	u1 stall;
 } memory_data_t;
 
 typedef struct packed {
@@ -353,7 +353,7 @@ typedef struct packed {
 	control_t ctl;
 	creg_addr_t dst;
 	word_t mem_addr;
-	u1 is_bubble;
+	u1 stall;
 } writeback_data_t;
 
 endpackage
