@@ -13,6 +13,7 @@ module decoder
     logic [6:0] f7 = raw_instr[6:0];
     logic [6:0] f7t = raw_instr[31:25];
     logic [2:0] f3 = raw_instr[14:12];
+    logic [5:0] f6 = raw_instr[31:26];
 
     always_comb begin
         ctl = '0;
@@ -42,6 +43,43 @@ module decoder
                         ctl.regwrite = 1'b1;
                         ctl.alufunc = ALU_AND;
                         ctl.memwrite = 1'b0;
+                    end
+                    F3_SLTI:begin
+                        ctl.op = SLTI;
+                        ctl.regwrite = 1'b1;
+                        ctl.alufunc = ALU_SSMALL;
+                        ctl.memwrite = 1'b0;
+                    end
+                    F3_SLTIU:begin
+                        ctl.op = SLTIU;
+                        ctl.regwrite = 1'b1;
+                        ctl.alufunc = ALU_USMALL;
+                        ctl.memwrite = 1'b0;
+                    end
+                    F3_SLLI:begin
+                        ctl.op = SLLI;
+                        ctl.regwrite = 1'b1;
+                        ctl.alufunc = ALU_LEFT;
+                        ctl.memwrite = 1'b0;
+                    end
+                    F3_SRLI:begin
+                        unique case(f6)
+                            F6_SRLI:begin
+                                ctl.op = SRLI;
+                                ctl.regwrite = 1'b1;
+                                ctl.alufunc = ALU_URIGHT;
+                                ctl.memwrite = 1'b0;
+                            end
+                            F6_SRAI:begin
+                                ctl.op = SRAI;
+                                ctl.regwrite = 1'b1;
+                                ctl.alufunc = ALU_SRIGHT;
+                                ctl.memwrite = 1'b0;
+                            end
+                            default:begin
+                                
+                            end
+                        endcase
                     end
                     default:begin end
                 endcase
@@ -99,6 +137,64 @@ module decoder
                         default:begin   end
                       endcase 
                    end
+                   F3_SLL:begin
+                      unique case(f7t)
+                          F7T_SLL:begin
+                                ctl.op = SLL;
+                                ctl.regwrite = 1'b1;
+                                ctl.alufunc = ALU_LEFT;
+                                ctl.memwrite = 1'b0;
+                          end
+                          default:begin
+                              
+                          end
+                      endcase 
+                   end
+                   F3_SLT:begin
+                      unique case(f7t)
+                          F7T_SLL:begin
+                                ctl.op = SLT;
+                                ctl.regwrite = 1'b1;
+                                ctl.alufunc = ALU_SSMALL;
+                                ctl.memwrite = 1'b0;
+                          end
+                          default:begin
+                              
+                          end
+                      endcase 
+                   end
+                   F3_SLTU:begin
+                      unique case(f7t)
+                          F7T_SLL:begin
+                                ctl.op = SLTU;
+                                ctl.regwrite = 1'b1;
+                                ctl.alufunc = ALU_USMALL;
+                                ctl.memwrite = 1'b0;
+                          end
+                          default:begin
+                              
+                          end
+                      endcase 
+                   end
+                   F3_SRL:begin
+                      unique case(f7t)
+                          F7T_SLL:begin
+                                ctl.op = SRL;
+                                ctl.regwrite = 1'b1;
+                                ctl.alufunc = ALU_URIGHT;
+                                ctl.memwrite = 1'b0;
+                          end
+                          F7T_SRA:begin
+                                ctl.op = SRA;
+                                ctl.regwrite = 1'b1;
+                                ctl.alufunc = ALU_SRIGHT;
+                                ctl.memwrite = 1'b0;
+                          end
+                          default:begin
+                              
+                          end
+                      endcase 
+                   end
                    default:begin end
                endcase 
             end
@@ -109,6 +205,38 @@ module decoder
                         ctl.regwrite = 1'b1;
                         ctl.alufunc = ALU_ADD;
                         ctl.memwrite = 1'b0;
+                    end
+                    F3_SLLIW:begin
+                        unique case(f6)
+                            F6_SLLIW:begin
+                                ctl.op = SLLIW;
+                                ctl.regwrite = 1'b1;
+                                ctl.alufunc = ALU_LEFT;
+                                ctl.memwrite = 1'b0;
+                            end
+                            default:begin
+                                
+                            end
+                        endcase
+                    end
+                    F3_SRLIW:begin
+                        unique case(f6)
+                            F6_SLLIW:begin
+                                ctl.op = SRLIW;
+                                ctl.regwrite = 1'b1;
+                                ctl.alufunc = ALU_URIGHT_32;
+                                ctl.memwrite = 1'b0;
+                            end
+                            F6_SRAIW:begin
+                                ctl.op = SRAIW;
+                                ctl.regwrite = 1'b1;
+                                ctl.alufunc = ALU_SRIGHT_32;
+                                ctl.memwrite = 1'b0;
+                            end
+                            default:begin
+                                
+                            end
+                        endcase
                     end
                     default:begin end
                 endcase
@@ -130,6 +258,38 @@ module decoder
                                 ctl.memwrite = 1'b0;
                             end
                             default:begin end
+                        endcase
+                    end
+                    F3_SLLW:begin
+                        unique case(f7t)
+                            F7T_SLLW:begin
+                                ctl.op = SLLW;
+                                ctl.regwrite = 1'b1;
+                                ctl.alufunc = ALU_LEFT;
+                                ctl.memwrite = 1'b0;
+                            end
+                            default:begin
+                                
+                            end
+                        endcase
+                    end
+                    F3_SRLW:begin
+                        unique case(f7t)
+                            F7T_SRLW:begin
+                                ctl.op = SRLW;
+                                ctl.regwrite = 1'b1;
+                                ctl.alufunc = ALU_URIGHT_32;
+                                ctl.memwrite = 1'b0;
+                            end
+                            F7T_SRAW:begin
+                                ctl.op = SRAW;
+                                ctl.regwrite = 1'b1;
+                                ctl.alufunc = ALU_SRIGHT_32;
+                                ctl.memwrite = 1'b0;
+                            end
+                            default:begin
+                                
+                            end
                         endcase
                     end
                     default:begin end
@@ -224,6 +384,76 @@ module decoder
                 ctl.regwrite = 1'b1;
                 ctl.alufunc = ALU_DIRECT;
                 ctl.memwrite = 1'b0;
+            end
+
+            F7_JAL:begin
+                ctl.op = JAL;
+                ctl.regwrite = 1'b1;
+                ctl.alufunc = ALU_ADD;
+                ctl.memwrite = 1'b0;
+            end
+            F7_JALR:begin
+                unique case(f3)
+                    F3_JALR:begin
+                        ctl.op = JALR;
+                        ctl.regwrite = 1'b1;
+                        ctl.alufunc = ALU_ADD;
+                        ctl.memwrite = 1'b0;
+                    end
+                    default:begin
+                        
+                    end
+                endcase
+            end
+            F7_AUIPC:begin
+                ctl.op = AUIPC;
+                ctl.regwrite = 1'b1;
+                ctl.alufunc = ALU_ADD;
+                ctl.memwrite = 1'b0;
+            end
+            
+            F7_BEQ:begin
+                unique case(f3)
+                    F3_BEQ:begin
+                        ctl.op = BEQ;
+                        ctl.regwrite = 1'b0;
+                        ctl.alufunc = ALU_NOP;
+                        ctl.memwrite = 1'b0;
+                    end
+                    F3_BNE:begin
+                        ctl.op = BNE;
+                        ctl.regwrite = 1'b0;
+                        ctl.alufunc = ALU_NOP;
+                        ctl.memwrite = 1'b0;
+                    end
+                    F3_BLT:begin
+                        ctl.op = BLT;
+                        ctl.regwrite = 1'b0;
+                        ctl.alufunc = ALU_NOP;
+                        ctl.memwrite = 1'b0;
+                    end
+                    F3_BGE:begin
+                        ctl.op = BGE;
+                        ctl.regwrite = 1'b0;
+                        ctl.alufunc = ALU_NOP;
+                        ctl.memwrite = 1'b0;
+                    end
+                    F3_BLTU:begin
+                        ctl.op = BLTU;
+                        ctl.regwrite = 1'b0;
+                        ctl.alufunc = ALU_NOP;
+                        ctl.memwrite = 1'b0;
+                    end
+                    F3_BGEU:begin
+                        ctl.op = BGEU;
+                        ctl.regwrite = 1'b0;
+                        ctl.alufunc = ALU_NOP;
+                        ctl.memwrite = 1'b0;
+                    end
+                    default:begin
+                        
+                    end
+                endcase
             end
 
 

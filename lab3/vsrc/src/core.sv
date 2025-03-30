@@ -31,9 +31,9 @@ module core
 
     /* TODO: Add your CPU-Core here. */
 
-    u64       pc, pc_nxt;
+    u64       pc, pc_nxt, offset;
     u32       raw_instr;
-    u1              handin;
+    u1        handin;
     fetch_data_t       dataF, dataF_nxt, saved_dataF;
     decode_data_t      dataD, dataD_nxt;
     execute_data_t     dataE, dataE_nxt;
@@ -42,7 +42,8 @@ module core
     creg_addr_t        ra1, ra2;
     word_t             rd1, rd2;
     u1                 stallpc, stalldata, stall, bubble;
-	u1 				   hazard_ra1, hazard_ra2;
+	u1 				   hazard_ra1, hazard_ra2, hazard_jalr;
+	instfunc_t         op_in, op_out;
     assign stallpc = ireq.valid & (~iresp.data_ok);
 	assign stalldata = dreq.valid & (~dresp.data_ok);
 	assign stall = dataD.stall;
@@ -93,15 +94,35 @@ module core
 						((~dataE.stall && ra2 == dataE.dst) || 
 						(~dataM.stall && ra2 == dataM.dst) || 
 						(~dataW.stall && ra2 == dataW.dst));
+	
+	assign hazard_jalr = (~stall && dataD.ctl.op == JALR) && (
+						(~dataM.stall && ra1 == dataE.dst) ||
+						(~dataM.stall && ra1 == dataM.dst) ||
+						(~dataW.stall && ra1 == dataW.dst));
 
-	assign bubble = hazard_ra1 || hazard_ra2;
+	assign bubble = hazard_ra1 || hazard_ra2 || hazard_jalr;
+	// assign bubble = hazard_ra1 || hazard_ra2;
+
+	always_comb begin
+		if(dataD.ctl.op == JALR)begin
+			if(hazard_jalr)begin
+				op_out = MAINTAIN;
+			end
+			else begin
+				op_out = JALR_P;
+			end
+		end
+		else begin
+			op_out = op_in;
+		end
+	end
 
 
     pcselect pcselect (
 		.pc, .stalldata, .stallpc, .ireq,
-		.pcplus4(pc + 4),
 		.pc_selected(pc_nxt),
-		.stall, .bubble
+		.stall, .bubble,
+		.op(op_out), .offset
 	);
 
 
@@ -123,11 +144,10 @@ module core
 
     decode decode (
         .dataF          (dataF_nxt),
-        .dataD          (dataD),
-        .ra1            (ra1),
-        .ra2            (ra2),
-        .rd1            (rd1),
-        .rd2            (rd2)
+        .dataD,
+        .ra1, .ra2,
+        .rd1, .rd2,
+		.op(op_in), .offset
     );
 
     reg_DE reg_DE (
@@ -195,7 +215,7 @@ module core
 		.valid              (handin),
 		.pc                 (dataW.pc),
 		.instr              (0),
-		.skip               (0),
+		.skip               (dataW.ctl.memwrite & ~dataW.mem_addr[31]),
 		.isRVC              (0),
 		.scFailed           (0),
 		.wen                (dataW.ctl.regwrite),

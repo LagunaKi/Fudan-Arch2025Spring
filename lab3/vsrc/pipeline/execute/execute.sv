@@ -98,7 +98,108 @@ module execute
                 alu_a = dataD.immediate;
                 alu_b = '0;
             end
-            
+            JAL:begin
+                alu_a = dataD.pc;
+                alu_b = {61'b0, 3'b100};
+            end
+            BEQ:begin
+                alu_a = '0;
+                alu_b = '0;
+            end
+            AUIPC:begin
+                alu_a = dataD.pc;
+                alu_b = dataD.immediate;
+            end
+            JALR:begin
+                alu_a = dataD.pc;
+                alu_b = {61'b0, 3'b100};
+            end
+
+            BNE:begin
+                alu_a = '0;
+                alu_b = '0;
+            end
+            BLT:begin
+                alu_a = '0;
+                alu_b = '0;
+            end
+            BGE:begin
+                alu_a = '0;
+                alu_b = '0;
+            end
+            BLTU:begin
+                alu_a = '0;
+                alu_b = '0;
+            end
+            BGEU:begin
+                alu_a = '0;
+                alu_b = '0;
+            end
+            SLTI:begin
+                alu_a = dataD.srca;
+                alu_b = dataD.immediate;
+            end
+            SLTIU:begin
+                alu_a = dataD.srca;
+                alu_b = dataD.immediate;
+            end
+            SLLI:begin
+                alu_a = dataD.srca;
+                alu_b = dataD.shamt;
+            end
+            SRLI:begin
+                alu_a = dataD.srca;
+                alu_b = dataD.shamt;
+            end
+            SRAI:begin
+                alu_a = dataD.srca;
+                alu_b = dataD.shamt;
+            end
+            SLL:begin
+                alu_a = dataD.srca;
+                alu_b = dataD.srcb;
+            end
+            SLT:begin
+                alu_a = dataD.srca;
+                alu_b = dataD.srcb;
+            end
+            SLTU:begin
+                alu_a = dataD.srca;
+                alu_b = dataD.srcb;
+            end
+            SRL:begin
+                alu_a = dataD.srca;
+                alu_b = {58'b0, dataD.srcb[5:0]};
+            end
+            SRA:begin
+                alu_a = dataD.srca;
+                alu_b = dataD.srcb;
+            end
+            SLLIW:begin
+                alu_a = dataD.srca;
+                alu_b = dataD.immediate;
+            end
+            SRLIW:begin
+                alu_a = {32'b0, dataD.srca[31:0]};
+                alu_b = dataD.shamt;
+            end
+            SRAIW:begin
+                alu_a = {32'b0, dataD.srca[31:0]};
+                alu_b = dataD.shamt;
+            end
+            SLLW:begin
+                alu_a = dataD.srca;
+                alu_b = {59'b0, dataD.srcb[4:0]};
+            end
+            SRLW:begin
+                alu_a = {32'b0, dataD.srca[31:0]};
+                alu_b = {59'b0, dataD.srcb[4:0]};
+            end
+            SRAW:begin
+                alu_a = {32'b0, dataD.srca[31:0]};
+                alu_b = {59'b0, dataD.srcb[4:0]};
+            end
+
             default:begin
                 alu_a = '0;
                 alu_b = '0;
@@ -127,7 +228,24 @@ module execute
             SUBW:begin
                 dataE.result = { {32{result[31]}},result[31:0] };
             end
-            
+            SLLIW:begin
+                dataE.result = { {32{result[31]}},result[31:0] };
+            end
+            SLLW:begin
+                dataE.result = { {32{result[31]}},result[31:0] };
+            end
+            SRLW:begin
+                dataE.result = { {32{result[31]}},result[31:0] };
+            end
+            SRAW:begin
+                dataE.result = { {32{result[31]}},result[31:0] };
+            end
+            SRAIW:begin
+                dataE.result = { {32{result[31]}},result[31:0] };
+            end
+            SRLIW:begin
+                dataE.result = { {32{result[31]}},result[31:0] };
+            end
             default:begin
                 dataE.result = result;
             end
