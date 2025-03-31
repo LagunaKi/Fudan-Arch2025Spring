@@ -85,13 +85,13 @@ module core
     end
 
 	// data hazard
-	assign hazard_ra1 = (~stall) && 
-						((~dataE.stall && ra1 == dataE.dst) || 
+	assign hazard_ra1 = (~stall) && (
+						(~dataE.stall && ra1 == dataE.dst) || 
 						(~dataM.stall && ra1 == dataM.dst) || 
 						(~dataW.stall && ra1 == dataW.dst));
 
-	assign hazard_ra2 = (~stall) && 
-						((~dataE.stall && ra2 == dataE.dst) || 
+	assign hazard_ra2 = (~stall) && (
+						(~dataE.stall && ra2 == dataE.dst) || 
 						(~dataM.stall && ra2 == dataM.dst) || 
 						(~dataW.stall && ra2 == dataW.dst));
 	
@@ -109,7 +109,7 @@ module core
 				op_out = MAINTAIN;
 			end
 			else begin
-				op_out = JALR_P;
+				op_out = F_JALR;
 			end
 		end
 		else begin
@@ -143,17 +143,18 @@ module core
     );
 
     decode decode (
-        .dataF          (dataF_nxt),
+        .dataF  (dataF_nxt),
         .dataD,
         .ra1, .ra2,
         .rd1, .rd2,
-		.op(op_in), .offset
+		.op     (op_in),
+		.offset
     );
 
     reg_DE reg_DE (
         .clk ,.reset , .stalldata,
-        .dataD_in       (dataD),
-        .dataD_out      (dataD_nxt),
+        .dataD_in   (dataD),
+        .dataD_out  (dataD_nxt),
 		.last_dataD (dataD_nxt),
 		.bubble
     );

@@ -332,9 +332,9 @@ typedef enum logic[6:0] {
 
 typedef enum logic [6:0] {
 	ALU_UNKNOWN, ALU_ADD, ALU_SUB, ALU_AND, ALU_OR,
-	ALU_XOR,ALU_DIRECT, ALU_NOP, ALU_SSMALL, ALU_USMALL, 
-	ALU_LEFT, ALU_URIGHT, ALU_SRIGHT,
-	ALU_URIGHT_32, ALU_SRIGHT_32
+	ALU_XOR,ALU_DIRECT, ALU_NOP, ALU_LT, ALU_LTU, 
+	ALU_SL, ALU_SRU, ALU_SR,
+	ALU_SRUW, ALU_SRW
 } alufunc_t;
 
 typedef enum logic [1:0] {
@@ -347,7 +347,7 @@ typedef enum logic [1:0] {
 } instr_FETCH_t;
 
 typedef enum logic [4:0] {
-	MAINTAIN, PLUS4, BEQ_P, BEQ_N, JAL_P, JALR_P
+	MAINTAIN, PLUS4, F_BEQ, N_BEQ, F_JAL, F_JALR
 } instfunc_t;
 
 typedef struct packed {

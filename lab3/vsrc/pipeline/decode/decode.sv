@@ -134,55 +134,55 @@ module decode
         unique case(ctl.op)
             BEQ:begin
                 if(rd1 == rd2)begin
-                    op = BEQ_P; 
+                    op = F_BEQ; 
                 end
                 else begin
-                     op = BEQ_N; 
+                     op = N_BEQ; 
                 end
             end
             BNE:begin
                 if(rd1 != rd2)begin
-                    op = BEQ_P; 
+                    op = F_BEQ; 
                 end
                 else begin
-                     op = BEQ_N; 
+                     op = N_BEQ; 
                 end
             end
             BLT:begin
                 if( $signed(rd1) < $signed(rd2) )begin
-                    op = BEQ_P; 
+                    op = F_BEQ; 
                 end
                 else begin
-                     op = BEQ_N; 
+                     op = N_BEQ; 
                 end
             end
             BGE:begin
                 if( $signed(rd1) >= $signed(rd2) )begin
-                    op = BEQ_P; 
+                    op = F_BEQ; 
                 end
                 else begin
-                     op = BEQ_N; 
+                     op = N_BEQ; 
                 end
             end
             BLTU:begin
                 if(rd1 < rd2)begin
-                    op = BEQ_P; 
+                    op = F_BEQ; 
                 end
                 else begin
-                     op = BEQ_N; 
+                     op = N_BEQ; 
                 end
             end
             BGEU:begin
                 if(rd1 >= rd2)begin
-                    op = BEQ_P; 
+                    op = F_BEQ; 
                 end
                 else begin
-                     op = BEQ_N; 
+                     op = N_BEQ; 
                 end
             end
 
             JAL:begin
-                op = JAL_P;
+                op = F_JAL;
             end
             default:begin
                 op = PLUS4; 

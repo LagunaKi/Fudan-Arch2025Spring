@@ -31,26 +31,26 @@ module alu
 			ALU_DIRECT: begin
 			    result = a; 
 			end
-			ALU_SSMALL: 
+			ALU_LT: 
 			begin 
 			     result = {63'b0,  $signed(a) < $signed(b) }; 
 			end
-			ALU_USMALL: begin 
+			ALU_LTU: begin 
 			     result = {63'b0,  a < b }; 
 			end
-			ALU_LEFT: begin 
+			ALU_SL: begin 
 			     result = a << b[5:0]; 
 			end
-			ALU_URIGHT: begin 
+			ALU_SRU: begin 
 			     result = a >> b[5:0]; 
 			end
-			ALU_SRIGHT: begin 
+			ALU_SR: begin 
 			     result = $signed(a) >>> b[5:0]; 
 			end
-			ALU_URIGHT_32: begin
+			ALU_SRUW: begin
 				result = {32'b0, a[31:0] >> b[5:0]};
 			end
-			ALU_SRIGHT_32: begin
+			ALU_SRW: begin
 				result = {{32{a[31]}}, a[31:0]} >>> b[5:0];
 			end
 			default: begin

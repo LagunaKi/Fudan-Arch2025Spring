@@ -23,47 +23,37 @@ always_comb begin
     if(stalldata || stall || stallpc || bubble) begin
         pc_selected = pc;
     end
-    else if( (op == BEQ_P ||op == JAL_P ) )begin
+    else if(ireq.valid == 0 && (op == PLUS4 || op == N_BEQ))begin
+        pc_selected = pc + 4;   
+    end
+    else if( (op == F_BEQ ||op == F_JAL ) )begin
             pc_selected = pc + offset;
         end
-        else if(ireq.valid == 0 && op == JALR_P )begin
-            pc_selected = offset;
-        end
-        else if(ireq.valid == 0 && op == PLUS4)begin
-            pc_selected = pc + 4;   
-        end
-        else if(ireq.valid == 0 && op == BEQ_N)begin
-            pc_selected = pc + 4; 
-        end
-        else if(ireq.valid == 0 )begin
-            pc_selected = pc;  
-        end
-        else begin
-            unique case (op)
-                BEQ_P:begin
-                    pc_selected = pc + offset;
-                end
-                BEQ_N:begin
-                    pc_selected = pc + 4;
-                end
-                PLUS4:begin
-                    pc_selected = pc + 4;
-                end
-                MAINTAIN:begin
-                    pc_selected = pc;
-                end
-                JAL_P:begin
-                    pc_selected = pc + offset;
-                end
-                JALR_P:begin
-                    pc_selected = offset;
-                end
-                default: begin
-                    pc_selected = pc + 4; 
-                end
-            endcase
-        end
-    
+    else if(ireq.valid == 0 && op == F_JALR )begin
+        pc_selected = offset;
+    end
+    else if(ireq.valid == 0 )begin
+        pc_selected = pc;  
+    end
+    else begin
+        unique case (op)
+            MAINTAIN:begin
+                pc_selected = pc;
+            end
+            F_BEQ:begin
+                pc_selected = pc + offset;
+            end
+            F_JAL:begin
+                pc_selected = pc + offset;
+            end
+            F_JALR:begin
+                pc_selected = offset;
+            end
+            default: begin
+                pc_selected = pc + 4; 
+            end
+        endcase
+    end
 end
 
 

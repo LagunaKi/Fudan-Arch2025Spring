@@ -214,10 +214,7 @@ module execute
         .result
     );
 
-    
-
     always_comb begin
-        dataE.result = '0;
         unique case(dataD.ctl.op)
             ADDIW:begin
                 dataE.result = { {32{result[31]}},result[31:0] };
