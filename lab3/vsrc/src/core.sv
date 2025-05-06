@@ -96,7 +96,7 @@ module core
 						(~dataW.stall && ra2 == dataW.dst));
 	
 	assign hazard_jalr = (~stall && dataD.ctl.op == JALR) && (
-						(~dataM.stall && ra1 == dataE.dst) ||
+						(~dataE.stall && ra1 == dataE.dst) ||
 						(~dataM.stall && ra1 == dataM.dst) ||
 						(~dataW.stall && ra1 == dataW.dst));
 

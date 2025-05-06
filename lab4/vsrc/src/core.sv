@@ -190,7 +190,7 @@ module core
         .clk, .reset, .stalldata, .flush, 
         .dataE_in       (dataE),
         .dataE_out      (dataE_nxt),
-		.last_dataE (dataE_nxt)
+		.last_dataE     (dataE_nxt)
     );
 
     memory memory (
