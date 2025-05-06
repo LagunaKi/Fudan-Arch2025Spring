@@ -461,8 +461,8 @@ module decoder
                             ctl.regwrite = 1'b0;
                             ctl.alufunc = ALU_DIRECT;
                             ctl.memwrite = 1'b0;
-                            ctl.csr_write = 1'b0;
-                            ctl.csr_read = 1'b0;
+                            ctl.csr_ops[0].we = 1'b0;
+                            ctl.csr_ops[0].addr = '0;
                             ctl.is_mret = 1'b1;
                             ctl.is_ecall = 1'b0;
                         end else if(raw_instr[31:20] == 12'h0) begin  // ECALL
@@ -470,59 +470,59 @@ module decoder
                             ctl.regwrite = 1'b0;
                             ctl.alufunc = ALU_DIRECT;
                             ctl.memwrite = 1'b0;
-                            ctl.csr_write = 1'b0;
-                            ctl.csr_read = 1'b0;
+                            ctl.csr_ops[0].we = 1'b0;
+                            ctl.csr_ops[0].addr = '0;
                             ctl.is_mret = 1'b0;
                             ctl.is_ecall = 1'b1;
                         end
                     end
                     3'b001:begin  // CSRRW
                         ctl.op = CSRRW;
-                        ctl.regwrite = (raw_instr[11:7] != 0);  // only write if rd != 0
+                        ctl.regwrite = (raw_instr[11:7] != 0);
                         ctl.alufunc = ALU_DIRECT;
                         ctl.memwrite = 1'b0;
-                        ctl.csr_write = 1'b1;
-                        ctl.csr_read = 1'b1;
+                        ctl.csr_ops[0].we = (raw_instr[11:7] != 0);
+                        ctl.csr_ops[0].addr = raw_instr[31:20];
                     end
                     3'b010:begin  // CSRRS
                         ctl.op = CSRRS;
                         ctl.regwrite = 1'b1;
                         ctl.alufunc = ALU_OR;
                         ctl.memwrite = 1'b0;
-                        ctl.csr_write = (raw_instr[19:15] != 0);  // only write if rs1 != 0
-                        ctl.csr_read = 1'b1;
+                        ctl.csr_ops[0].we = (raw_instr[19:15] != 0);
+                        ctl.csr_ops[0].addr = raw_instr[31:20];
                     end
                     3'b011:begin  // CSRRC
                         ctl.op = CSRRC;
                         ctl.regwrite = 1'b1;
                         ctl.alufunc = ALU_AND;
                         ctl.memwrite = 1'b0;
-                        ctl.csr_write = (raw_instr[19:15] != 0);  // only write if rs1 != 0
-                        ctl.csr_read = 1'b1;
+                        ctl.csr_ops[0].we = (raw_instr[19:15] != 0);
+                        ctl.csr_ops[0].addr = raw_instr[31:20];
                     end
                     3'b101:begin  // CSRRWI
                         ctl.op = CSRRWI;
-                        ctl.regwrite = (raw_instr[11:7] != 0);  // only write if rd != 0
+                        ctl.regwrite = (raw_instr[11:7] != 0);
                         ctl.alufunc = ALU_DIRECT;
                         ctl.memwrite = 1'b0;
-                        ctl.csr_write = 1'b1;
-                        ctl.csr_read = 1'b1;
+                        ctl.csr_ops[0].we = (raw_instr[11:7] != 0);
+                        ctl.csr_ops[0].addr = raw_instr[31:20];
                     end
                     3'b110:begin  // CSRRSI
                         ctl.op = CSRRSI;
                         ctl.regwrite = 1'b1;
                         ctl.alufunc = ALU_OR;
                         ctl.memwrite = 1'b0;
-                        ctl.csr_write = (raw_instr[19:15] != 0);  // only write if imm != 0
-                        ctl.csr_read = 1'b1;
+                        ctl.csr_ops[0].we = (raw_instr[19:15] != 0);
+                        ctl.csr_ops[0].addr = raw_instr[31:20];
                     end
                     3'b111:begin  // CSRRCI
                         ctl.op = CSRRCI;
                         ctl.regwrite = 1'b1;
                         ctl.alufunc = ALU_AND;
                         ctl.memwrite = 1'b0;
-                        ctl.csr_write = (raw_instr[19:15] != 0);  // only write if imm != 0
-                        ctl.csr_read = 1'b1;
+                        ctl.csr_ops[0].we = (raw_instr[19:15] != 0);
+                        ctl.csr_ops[0].addr = raw_instr[31:20];
                     end
                     default:begin end
                 endcase

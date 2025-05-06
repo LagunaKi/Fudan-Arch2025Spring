@@ -374,17 +374,26 @@ typedef struct packed {
 	u1 stall;
 } fetch_data_t;
 
+// CSR operation definition
 typedef struct packed {
-	decode_op_t op;
-	alufunc_t alufunc;
-	u1 regwrite;
-	u1 memwrite;
-	// CSR control signals
-	u1 csr_write;
-	u1 csr_read;
-	// Privileged instruction control
-	u1 is_mret;  // 1 if current instruction is MRET
-	u1 is_ecall; // 1 if current instruction is ECALL
+    csr_addr_t addr;  // CSR address
+    word_t data;      // Data to write
+    u1 we;            // Write enable
+} csr_op_t;
+
+parameter CSR_OPS_NUM = 3; // Support up to 3 CSR operations per instruction
+typedef csr_op_t [CSR_OPS_NUM-1:0] csr_ops_t;
+
+typedef struct packed {
+    decode_op_t op;
+    alufunc_t alufunc;
+    u1 regwrite;
+    u1 memwrite;
+    // CSR operations
+    csr_ops_t csr_ops;  // Multiple CSR operations
+    // Privileged instruction control
+    u1 is_mret;  // 1 if current instruction is MRET
+    u1 is_ecall; // 1 if current instruction is ECALL
 } control_t;
 
 typedef struct packed {

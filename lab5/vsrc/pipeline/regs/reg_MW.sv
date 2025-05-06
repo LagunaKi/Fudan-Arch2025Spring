@@ -22,8 +22,7 @@ module reg_MW
             dataM_out.ctl.op <= UNKNOWN;
             dataM_out.ctl.alufunc <= ALU_NOP;
             dataM_out.ctl.regwrite <= '0;
-            dataM_out.ctl.csr_write <= '0;
-            dataM_out.ctl.csr_read <= '0;
+            dataM_out.ctl.csr_ops <= '0;
             dataM_out.dst <= '0;
             dataM_out.mem_addr <= '0;
             dataM_out.csr_addr <= '0;
@@ -37,8 +36,7 @@ module reg_MW
             dataM_out.ctl.op <= UNKNOWN;
             dataM_out.ctl.alufunc <= ALU_NOP;
             dataM_out.ctl.regwrite <= '0;
-            dataM_out.ctl.csr_write <= '0;
-            dataM_out.ctl.csr_read <= '0;
+            dataM_out.ctl.csr_ops <= '0;
             dataM_out.dst <= '0;
             dataM_out.mem_addr <= '0;
             dataM_out.csr_addr <= '0;

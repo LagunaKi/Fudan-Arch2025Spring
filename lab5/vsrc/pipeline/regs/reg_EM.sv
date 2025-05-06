@@ -21,8 +21,7 @@ module reg_EM
             dataE_out.ctl.op <= UNKNOWN;
             dataE_out.ctl.alufunc <= ALU_NOP;
             dataE_out.ctl.regwrite <= '0;
-            dataE_out.ctl.csr_write <= '0;
-            dataE_out.ctl.csr_read <= '0;
+            dataE_out.ctl.csr_ops <= '0;
             dataE_out.dst <= '0;
             dataE_out.mem_addr <= '0;
             dataE_out.csr_addr <= '0;
@@ -36,8 +35,7 @@ module reg_EM
             dataE_out.ctl.op <= UNKNOWN;
             dataE_out.ctl.alufunc <= ALU_NOP;
             dataE_out.ctl.regwrite <= '0;
-            dataE_out.ctl.csr_write <= '0;
-            dataE_out.ctl.csr_read <= '0;
+            dataE_out.ctl.csr_ops <= '0;
             dataE_out.dst <= '0;
             dataE_out.mem_addr <= '0;
             dataE_out.csr_addr <= '0;

@@ -250,17 +250,50 @@ module execute
             MRET:begin
                 // Set MRET operation flag
                 dataE.ctl.is_mret = 1'b1;
-                dataE.ctl.csr_write = 1'b1;
-                dataE.csr_result = dataD.pc + 4;  // Return address
-                dataE.csr_addr = CSR_MEPC;
+                
+                // Operation 0: Write mepc (return address)
+                dataE.ctl.csr_ops[0].addr = CSR_MEPC;
+                dataE.ctl.csr_ops[0].data = dataD.pc + 4;
+                dataE.ctl.csr_ops[0].we = 1'b1;
+                
+                // Operation 1: Update mstatus
+                dataE.ctl.csr_ops[1].addr = CSR_MSTATUS;
+                dataE.ctl.csr_ops[1].data = dataD.csr_data;
+                // MIE = MPIE
+                dataE.ctl.csr_ops[1].data[3] = dataD.csr_data[7];
+                // MPIE = 1
+                dataE.ctl.csr_ops[1].data[7] = 1'b1;
+                // MPP = 00 (user mode)
+                dataE.ctl.csr_ops[1].data[12:11] = 2'b00;
+                dataE.ctl.csr_ops[1].we = 1'b1;
+                
                 dataE.result = '0;
             end
             ECALL:begin
-                // Set ECALL operation flag 
+                // Set ECALL operation flag
                 dataE.ctl.is_ecall = 1'b1;
-                dataE.ctl.csr_write = 1'b1;
-                dataE.csr_result = dataD.pc;  // Current PC for MEPC
-                dataE.csr_addr = CSR_MEPC;
+                
+                // Operation 0: Write mepc (current PC)
+                dataE.ctl.csr_ops[0].addr = CSR_MEPC;
+                dataE.ctl.csr_ops[0].data = dataD.pc;
+                dataE.ctl.csr_ops[0].we = 1'b1;
+                
+                // Operation 1: Update mstatus
+                dataE.ctl.csr_ops[1].addr = CSR_MSTATUS;
+                dataE.ctl.csr_ops[1].data = dataD.csr_data;
+                // MPP = 11 (M-mode)
+                dataE.ctl.csr_ops[1].data[12:11] = 2'b11;
+                // MPIE = MIE
+                dataE.ctl.csr_ops[1].data[7] = dataD.csr_data[3];
+                // MIE = 0
+                dataE.ctl.csr_ops[1].data[3] = 1'b0;
+                dataE.ctl.csr_ops[1].we = 1'b1;
+                
+                // Operation 2: Write mcause (exception cause)
+                dataE.ctl.csr_ops[2].addr = CSR_MCAUSE;
+                dataE.ctl.csr_ops[2].data = 64'd11; // ECALL from M-mode
+                dataE.ctl.csr_ops[2].we = 1'b1;
+                
                 dataE.result = '0;
             end
             ADDIW:begin
@@ -299,8 +332,4 @@ module execute
             end
         endcase
     end
-	
-
-
-
 endmodule
