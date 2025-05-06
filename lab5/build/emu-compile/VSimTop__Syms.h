@@ -33,6 +33,7 @@ class VSimTop__Syms final : public VerilatedSyms {
     VSimTop___024unit              TOP____024unit;
 
     // SCOPE NAMES
+    VerilatedScope __Vscope_SimTop__core;
     VerilatedScope __Vscope_SimTop__core__csr_regfile;
     VerilatedScope __Vscope_SimTop__core__decode__decoder;
     VerilatedScope __Vscope_SimTop__core__memory;

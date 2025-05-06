@@ -48,6 +48,8 @@ VL_MODULE(VSimTop___024root) {
         CData/*0:0*/ SimTop__DOT__core__DOT__hazard_csr;
         CData/*4:0*/ SimTop__DOT__core__DOT__op_in;
         CData/*4:0*/ SimTop__DOT__core__DOT__op_out;
+        CData/*1:0*/ SimTop__DOT__core__DOT__csr_state;
+        CData/*1:0*/ SimTop__DOT__core__DOT__csr_state_next;
         CData/*2:0*/ SimTop__DOT__core__DOT__memory__DOT__msize;
         CData/*7:0*/ SimTop__DOT__core__DOT__memory__DOT__strobe;
         CData/*0:0*/ SimTop__DOT__core__DOT__memory__DOT__isunsigned;
@@ -99,10 +101,10 @@ VL_MODULE(VSimTop___024root) {
         VlWide<5>/*150:0*/ SimTop__DOT__ram__DOT__saved_oreq;
         QData/*63:0*/ SimTop__DOT__ram__DOT__addr;
         QData/*63:0*/ SimTop__DOT__ram__DOT__idx;
-        QData/*63:0*/ SimTop__DOT__ram__DOT__wrap1;
-        QData/*63:0*/ SimTop__DOT__ram__DOT__wrap2;
     };
     struct {
+        QData/*63:0*/ SimTop__DOT__ram__DOT__wrap1;
+        QData/*63:0*/ SimTop__DOT__ram__DOT__wrap2;
         QData/*63:0*/ SimTop__DOT__ram__DOT__cyc_cnt;
         QData/*63:0*/ SimTop__DOT__ram__DOT__ms_cnt;
         QData/*63:0*/ SimTop__DOT__ram__DOT__wmask;

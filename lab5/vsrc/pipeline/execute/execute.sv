@@ -250,16 +250,16 @@ module execute
             MRET:begin
                 // Set MRET operation flag
                 dataE.ctl.is_mret = 1'b1;
+                dataE.ctl.csr_write = 1'b1;
                 dataE.csr_result = dataD.pc + 4;  // Return address
-                dataE.csr_write = 1'b1;
                 dataE.csr_addr = CSR_MEPC;
                 dataE.result = '0;
             end
             ECALL:begin
                 // Set ECALL operation flag 
                 dataE.ctl.is_ecall = 1'b1;
+                dataE.ctl.csr_write = 1'b1;
                 dataE.csr_result = dataD.pc;  // Current PC for MEPC
-                dataE.csr_write = 1'b1;
                 dataE.csr_addr = CSR_MEPC;
                 dataE.result = '0;
             end

@@ -91,7 +91,54 @@ module core
     assign csr_write = (dataW.ctl.op inside {CSRRW, CSRRS, CSRRC, CSRRWI, CSRRSI, CSRRCI, ECALL}) & ~dataW.stall;
     
     // Flush pipeline on CSR writes or exception/return instructions
-    assign flush = csr_write || (dataE.ctl.op inside {ECALL, MRET});
+    // Enhanced flush logic with multi-cycle CSR operation support
+    typedef enum logic [1:0] {
+        CSR_IDLE,
+        CSR_MRET,
+        CSR_ECALL
+    } csr_state_t;
+    
+    csr_state_t csr_state, csr_state_next;
+    
+    always_ff @(posedge clk) begin
+        if (reset) begin
+            csr_state <= CSR_IDLE;
+        end else begin
+            csr_state <= csr_state_next;
+        end
+    end
+    
+    always_comb begin
+        csr_state_next = csr_state;
+        flush = 1'b0;
+        
+        unique case (csr_state)
+            CSR_IDLE: begin
+                if (dataE.ctl.is_mret) begin
+                    csr_state_next = CSR_MRET;
+                    flush = 1'b1;
+                end else if (dataE.ctl.is_ecall) begin
+                    csr_state_next = CSR_ECALL;
+                    flush = 1'b1;
+                end
+            end
+            CSR_MRET: begin
+                // Handle MRET CSR updates
+                csr_state_next = CSR_IDLE;
+            end
+            CSR_ECALL: begin
+                // Handle ECALL CSR updates
+                csr_state_next = CSR_IDLE;
+            end
+            default: begin
+                // Handle unexpected states
+                csr_state_next = CSR_IDLE;
+            end
+        endcase
+        
+        // Maintain original flush conditions
+        flush = flush || csr_write;
+    end
 
 	// data hazard
     // CSR hazard detection

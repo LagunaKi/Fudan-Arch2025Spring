@@ -60,9 +60,9 @@ package csr_pkg;
   } mstatus_t;
 
   typedef struct packed {
-    u4  mode;
-    u16 asid;
-    u44 ppn;
+    u4 mode;  // [63:60]
+    u16 asid; // [59:44]
+    u44 ppn; //  [43:0]
   } satp_t;
 endpackage`ifndef CSR_SV
 `define CSR_SV

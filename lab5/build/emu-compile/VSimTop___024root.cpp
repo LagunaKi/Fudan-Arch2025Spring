@@ -4482,9 +4482,13 @@ VL_INLINE_OPT void VSimTop___024root___sequent__TOP__3(VSimTop___024root* vlSelf
     }
     __Vdlyvset__SimTop__DOT__core__DOT__csr_regfile__DOT__csr__v0 = 0U;
     __Vdlyvset__SimTop__DOT__core__DOT__csr_regfile__DOT__csr__v10 = 0U;
-    vlSelf->SimTop__DOT__core__DOT__pc = ((IData)(vlSelf->reset)
-                                           ? 0x80000000ULL
-                                           : vlSelf->SimTop__DOT__core__DOT__pc_nxt);
+    if (vlSelf->reset) {
+        vlSelf->SimTop__DOT__core__DOT__pc = 0x80000000ULL;
+        vlSelf->SimTop__DOT__core__DOT__csr_state = 0U;
+    } else {
+        vlSelf->SimTop__DOT__core__DOT__pc = vlSelf->SimTop__DOT__core__DOT__pc_nxt;
+        vlSelf->SimTop__DOT__core__DOT__csr_state = vlSelf->SimTop__DOT__core__DOT__csr_state_next;
+    }
     if (vlSelf->reset) {
         __Vilp = 0U;
         while ((__Vilp <= 0x3fU)) {

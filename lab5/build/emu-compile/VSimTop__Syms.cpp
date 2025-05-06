@@ -28,6 +28,7 @@ VSimTop__Syms::VSimTop__Syms(VerilatedContext* contextp, const char* namep,VSimT
     TOP.__Vconfigure(this, true);
     TOP____024unit.__Vconfigure(this, true);
     // Setup scopes
+    __Vscope_SimTop__core.configure(this, name(), "SimTop.core", "core", -12, VerilatedScope::SCOPE_OTHER);
     __Vscope_SimTop__core__csr_regfile.configure(this, name(), "SimTop.core.csr_regfile", "csr_regfile", 0, VerilatedScope::SCOPE_OTHER);
     __Vscope_SimTop__core__decode__decoder.configure(this, name(), "SimTop.core.decode.decoder", "decoder", -12, VerilatedScope::SCOPE_OTHER);
     __Vscope_SimTop__core__memory.configure(this, name(), "SimTop.core.memory", "memory", -12, VerilatedScope::SCOPE_OTHER);
