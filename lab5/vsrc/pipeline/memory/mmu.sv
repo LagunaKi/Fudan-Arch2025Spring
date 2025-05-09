@@ -42,19 +42,23 @@ module mmu
 
     // Control signals;
     logic        m_mode_direct;
-    u64          pte_addr_reg;
-    logic [63:0] paddr_reg;
 
 
     assign m_mode_direct = (privilege_mode == PRIVILEGE_M_MODE);
 
+    always_comb begin
+        vaddr_reg = '0;
+        if (~m_mode_direct && (mmu_dreq.valid || mmu_ireq.valid)) begin
+            vaddr_reg = mmu_dreq.valid ? mmu_dreq.addr : mmu_ireq.addr;
+        end
+    end
+
     // cbus response management
     always_comb begin
         // 非M模式时寄存响应
-        mmu_dresp = dresp;
-        mmu_iresp = iresp;
-
         if (~m_mode_direct) begin
+            mmu_dresp = 0;
+            mmu_iresp = 0;
             if (state == FINISH) begin
                 if (is_fetch) begin
                     mmu_iresp = iresp;
@@ -72,12 +76,7 @@ module mmu
 
     // cbus request management
     always_ff@(posedge clk) begin
-
-        
-        
         if (m_mode_direct) begin
-            // ireq <= mmu_ireq;
-            // dreq <= mmu_dreq;
             if(ireq.valid == 1'b0)begin
                 ireq <= mmu_ireq;
             end
@@ -102,21 +101,69 @@ module mmu
         end
 
         case (state)
-            LEVEL1, LEVEL2, LEVEL3: begin
-                dreq <= '{valid: 1'b1, addr: pte_addr_reg, data: mmu_dreq.data, size: MSIZE8, strobe: '1};
+            LEVEL1: begin
+                if (dreq.valid == 1'b0) begin
+                    dreq <= '{valid: 1'b1, addr: {8'b0, satp.ppn, vaddr_reg[38:30], 3'b0}, data: mmu_dreq.data, size: MSIZE8, strobe: '0};
+                end
+                else if (dresp.data_ok == 0) begin
+                    dreq <= dreq;
+                end
+                else begin
+                    dreq.valid <= 1'b0;
+                end
+
+            end
+            LEVEL2: begin
+                if (dreq.valid == 1'b0) begin
+                    dreq <= '{valid: 1'b1, addr: {8'b0, pte_reg[0][53:10], vaddr_reg[29:21], 3'b0}, data: mmu_dreq.data, size: MSIZE8, strobe: '0};
+                end
+                else if (dresp.data_ok == 0) begin
+                    dreq <= dreq;
+                end
+                else begin
+                    dreq.valid <= 1'b0;
+                end
+            end
+            LEVEL3:begin
+                if (dreq.valid == 1'b0) begin
+                    dreq <= '{valid: 1'b1, addr: {8'b0, pte_reg[1][53:10], vaddr_reg[20:12], 3'b0}, data: mmu_dreq.data, size: MSIZE8, strobe: '0};
+                end
+                else if (dresp.data_ok == 0) begin
+                    dreq <= dreq;
+                end
+                else begin
+                    dreq.valid <= 1'b0;
+                end
             end
             FINISH: begin
                 if(is_fetch)begin 
-                    ireq <= '{valid: 1'b1, addr: paddr_reg};
+                    if(ireq.valid == 1'b0)begin
+                        ireq <= '{valid: 1'b1, addr: {8'b0, pte_reg[2][53:10], vaddr_reg[11:0]}};
+                    end
+                    else if (iresp.data_ok == 0)begin
+                        ireq <= ireq;
+                    end
+                    else begin
+                        ireq.valid <= 1'b0;
+                    end
                 end
                 if(~is_fetch)begin 
-                    dreq <= '{
-                        valid: 1'b1,
-                        addr: paddr_reg,
-                        data: mmu_dreq.data,
-                        size: mmu_dreq.size,
-                        strobe: mmu_dreq.strobe
-                    };
+                    
+                    if(dreq.valid == 1'b0)begin
+                        dreq <= '{
+                            valid: 1'b1,
+                            addr: {8'b0, pte_reg[2][53:10], vaddr_reg[11:0]},
+                            data: mmu_dreq.data,
+                            size: mmu_dreq.size,
+                            strobe: mmu_dreq.strobe
+                        };
+                    end
+                    else if (dresp.data_ok == 0)begin
+                        dreq <= dreq;
+                    end
+                    else begin
+                        dreq.valid <= 1'b0;
+                    end
                 end
             end
             default: begin end
@@ -127,44 +174,33 @@ module mmu
     always_ff @(posedge clk) begin
         if (reset) begin
             state <= IDLE;
-            vaddr_reg <= '0;
             foreach (pte_reg[i]) pte_reg[i] <= '0;
             is_fetch <= '0;
-            paddr_reg <= '0;
         end else begin
             state <= state_next;
 
             case (state)
                 IDLE: begin
                     if (~m_mode_direct && (mmu_dreq.valid || mmu_ireq.valid)) begin
-                        vaddr_reg <= mmu_dreq.valid ? mmu_dreq.addr : mmu_ireq.addr;
                         is_fetch <= mmu_ireq.valid;
                     end
                 end
                 
-                LEVEL1: begin
-                    pte_addr_reg <= {8'b0, satp.ppn, 12'b0} + {52'b0, vaddr_reg[38:30], 3'b0};
-                    
+                LEVEL1: begin    
                     if (dresp.data_ok)begin
                         pte_reg[0] <= dresp.data;
                     end 
                 end
                 LEVEL2:begin
-                    pte_addr_reg <= {8'b0, pte_reg[0][53:10], 12'b0} + {52'b0, vaddr_reg[29:21], 3'b0};
                     if(dresp.data_ok)begin
                         pte_reg[1] <= dresp.data;
                     end
                 end
                 
                 LEVEL3: begin
-                    pte_addr_reg <= {8'b0, pte_reg[1][53:10], 12'b0} + {52'b0, vaddr_reg[20:12], 3'b0};
                     if(dresp.data_ok)begin
                         pte_reg[2] <= dresp.data;
                     end
-                end
-                
-                FINISH: begin
-                    paddr_reg <= {8'b0, pte_reg[2][53:10], vaddr_reg[11:0]};
                 end
                 default: begin end
             endcase
@@ -225,7 +261,7 @@ module mmu
                 default: begin end
             endcase
             
-            mmu_page_fault = perm_err | (paddr_reg[63:40] != 24'h0); // 物理地址范围检查
+            mmu_page_fault = perm_err;
         end
     end
 

@@ -1,11 +1,13 @@
 `ifdef VERILATOR
 `include "include/common.sv"
+`include "include/csr.sv"
 `else
 
 `endif
 
 module decoder
     import common::*;
+    import csr_pkg::*;
 (
     input u32 raw_instr,
     output control_t ctl
@@ -461,19 +463,55 @@ module decoder
                             ctl.regwrite = 1'b0;
                             ctl.alufunc = ALU_DIRECT;
                             ctl.memwrite = 1'b0;
-                            ctl.csr_ops[0].we = 1'b0;
-                            ctl.csr_ops[0].addr = '0;
+                            // ctl.csr_ops[0].we = 1'b0;
+                            // ctl.csr_ops[0].addr = '0;
                             ctl.is_mret = 1'b1;
                             ctl.is_ecall = 1'b0;
+                            // Set MRET operation flag
+                            ctl.is_mret = 1'b1;
+                            
+                            // // Operation 0: Update mstatus (no mepc write needed)
+                            // ctl.csr_ops[0].addr = CSR_MSTATUS;
+                            // ctl.csr_ops[0].data = dataD.csr_data;
+                            // // MIE = MPIE
+                            // ctl.csr_ops[0].data[3] = dataD.csr_data[7];
+                            // // MPIE = 0 (clear MPIE)
+                            // ctl.csr_ops[0].data[7] = 1'b1;
+                            // // MPP = 00 (user mode)
+                            // ctl.csr_ops[0].data[12:11] = 2'b00;
+                            // ctl.csr_ops[0].we = 1'b1;
                         end else if(raw_instr[31:20] == 12'h0) begin  // ECALL
                             ctl.op = ECALL;
                             ctl.regwrite = 1'b0;
                             ctl.alufunc = ALU_DIRECT;
                             ctl.memwrite = 1'b0;
-                            ctl.csr_ops[0].we = 1'b0;
-                            ctl.csr_ops[0].addr = '0;
+                            // ctl.csr_ops[0].we = 1'b0;
+                            // ctl.csr_ops[0].addr = '0;
                             ctl.is_mret = 1'b0;
                             ctl.is_ecall = 1'b1;
+                            // Set ECALL operation flag
+                            ctl.is_ecall = 1'b1;
+                            
+                            // // Operation 0: Write mepc (current PC)
+                            // ctl.csr_ops[0].addr = CSR_MEPC;
+                            // ctl.csr_ops[0].data = dataD.pc;
+                            // ctl.csr_ops[0].we = 1'b1;
+                            
+                            // // Operation 1: Update mstatus
+                            // ctl.csr_ops[1].addr = CSR_MSTATUS;
+                            // ctl.csr_ops[1].data = dataD.csr_data;
+                            // // MPP = 11 (M-mode)
+                            // ctl.csr_ops[1].data[12:11] = 2'b11;
+                            // // MPIE = MIE
+                            // ctl.csr_ops[1].data[7] = dataD.csr_data[3];
+                            // // MIE = 0
+                            // ctl.csr_ops[1].data[3] = 1'b0;
+                            // ctl.csr_ops[1].we = 1'b1;
+                            
+                            // // Operation 2: Write mcause (exception cause)
+                            // ctl.csr_ops[2].addr = CSR_MCAUSE;
+                            // ctl.csr_ops[2].data = 64'd00; // ECALL from U-mode
+                            // ctl.csr_ops[2].we = 1'b1;
                         end
                     end
                     3'b001:begin  // CSRRW

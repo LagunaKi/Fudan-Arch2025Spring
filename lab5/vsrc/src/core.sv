@@ -218,7 +218,7 @@ module core
         if(reset)begin
             privilege_mode_reg <= PRIVILEGE_M_MODE;
         end
-        else if(dataD.ctl.is_mret)begin
+        else if(dataW.ctl.is_mret || dataW.ctl.is_ecall)begin
             privilege_mode_reg <= (csr_regfile.csr_nxt[CSR_MSTATUS][12:11] == 2'b11) ? PRIVILEGE_M_MODE :
                                 (csr_regfile.csr_nxt[CSR_MSTATUS][12:11] == 2'b01) ? PRIVILEGE_S_MODE :
                                 PRIVILEGE_U_MODE;

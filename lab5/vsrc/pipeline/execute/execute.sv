@@ -248,7 +248,7 @@ module execute
         unique case(dataD.ctl.op)
             MRET:begin
                 // Set MRET operation flag
-                dataE.ctl.is_mret = 1'b1;
+                // dataE.ctl.is_mret = 1'b1;
                 
                 // Operation 0: Update mstatus (no mepc write needed)
                 dataE.ctl.csr_ops[0].addr = CSR_MSTATUS;
@@ -265,7 +265,7 @@ module execute
             end
             ECALL:begin
                 // Set ECALL operation flag
-                dataE.ctl.is_ecall = 1'b1;
+                // dataE.ctl.is_ecall = 1'b1;
                 
                 // Operation 0: Write mepc (current PC)
                 dataE.ctl.csr_ops[0].addr = CSR_MEPC;
@@ -285,7 +285,7 @@ module execute
                 
                 // Operation 2: Write mcause (exception cause)
                 dataE.ctl.csr_ops[2].addr = CSR_MCAUSE;
-                dataE.ctl.csr_ops[2].data = 64'd11; // ECALL from M-mode
+                dataE.ctl.csr_ops[2].data = 64'd00; // ECALL from U-mode
                 dataE.ctl.csr_ops[2].we = 1'b1;
                 
                 dataE.result = '0;
