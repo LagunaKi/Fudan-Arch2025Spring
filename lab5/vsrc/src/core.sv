@@ -64,7 +64,7 @@ module core
 	assign stall = dataD.stall;
 	assign handin = ~dataW.stall;
 
-    	always_ff @(posedge clk) begin
+    always_ff @(posedge clk) begin
         if (reset) begin
             pc <= 64'h8000_0000;
             // mmu_ireq.addr <= '0;
@@ -245,7 +245,7 @@ module core
 
     memory memory(
         .dataE(dataE_nxt),               // Unchanged pipeline data
-        .dresp(mmu_page_fault ? '0 : mmu_dresp), // Responses go through MMU
+        .dresp(mmu_dresp), // Responses go through MMU
         // .dreq(dreq),                    // Memory requests go directly to system
         .dreq(mmu_dreq),
         .dataM(dataM),                  // Unchanged pipeline output

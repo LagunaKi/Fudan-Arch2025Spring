@@ -40,79 +40,99 @@ module mmu
     logic [63:0] pte_reg[3];
     logic is_fetch;
 
-    // Control signals
-    logic        ireq_sent; //if in request
-    logic        dreq_sent;
+    // Control signals;
     logic        m_mode_direct;
     u64          pte_addr_reg;
     logic [63:0] paddr_reg;
 
-    // dbus_resp_t mmu_dresp_reg;
-    // ibus_resp_t mmu_iresp_reg;
 
-    // 关键修改1: 显式分离M模式透传逻辑
     assign m_mode_direct = (privilege_mode == PRIVILEGE_M_MODE);
 
-    // 关键修改2: 简化响应直连路径
-    // assign mmu_iresp = m_mode_direct ? iresp : mmu_iresp_reg;
-    // assign mmu_dresp = m_mode_direct ? dresp : mmu_dresp_reg;
-
-
+    // cbus response management
     always_comb begin
         // 非M模式时寄存响应
-        // mmu_dresp_reg = '0;
-        // mmu_iresp_reg = '0;
         mmu_dresp = dresp;
         mmu_iresp = iresp;
 
         if (~m_mode_direct) begin
             if (state == FINISH) begin
                 if (is_fetch) begin
-                    // mmu_iresp_reg = iresp;
                     mmu_iresp = iresp;
                 end else begin
-                    // mmu_dresp_reg = dresp;
                     mmu_dresp = dresp;
                 end
             end
         end
         else begin
             // M模式透传
-            // mmu_iresp_reg = iresp;
-            // mmu_dresp_reg = dresp;
             mmu_iresp = iresp;
             mmu_dresp = dresp;
         end
     end
 
-    // 关键修改3: 重构状态机转换逻辑
+    // cbus request management
+    always_ff@(posedge clk) begin
+
+        
+        
+        if (m_mode_direct) begin
+            // ireq <= mmu_ireq;
+            // dreq <= mmu_dreq;
+            if(ireq.valid == 1'b0)begin
+                ireq <= mmu_ireq;
+            end
+            else if (iresp.data_ok == 0)begin
+                ireq <= ireq;
+            end
+            else begin
+                ireq.addr <= ireq.addr;
+                ireq.valid <= 1'b0;
+            end
+
+            if(dreq.valid == 1'b0)begin
+                dreq <= mmu_dreq;
+            end
+            else if(dresp.data_ok == 0)begin
+                dreq <= dreq;
+            end
+            else begin
+                dreq <= dreq;
+                dreq.valid <= 1'b0;
+            end
+        end
+
+        case (state)
+            LEVEL1, LEVEL2, LEVEL3: begin
+                dreq <= '{valid: 1'b1, addr: pte_addr_reg, data: mmu_dreq.data, size: MSIZE8, strobe: '1};
+            end
+            FINISH: begin
+                if(is_fetch)begin 
+                    ireq <= '{valid: 1'b1, addr: paddr_reg};
+                end
+                if(~is_fetch)begin 
+                    dreq <= '{
+                        valid: 1'b1,
+                        addr: paddr_reg,
+                        data: mmu_dreq.data,
+                        size: mmu_dreq.size,
+                        strobe: mmu_dreq.strobe
+                    };
+                end
+            end
+            default: begin end
+        endcase
+    end
+
+    // state machine behavior
     always_ff @(posedge clk) begin
         if (reset) begin
             state <= IDLE;
             vaddr_reg <= '0;
             foreach (pte_reg[i]) pte_reg[i] <= '0;
             is_fetch <= '0;
-            // {dreq, ireq} <= '0;
-            // {mmu_dresp_reg, mmu_iresp_reg} <= '0;
-            // ireq_sent <= '0;
-            // dreq_sent <= '0;
             paddr_reg <= '0;
         end else begin
             state <= state_next;
-
-            // 请求完成检测（统一处理）
-            // if (dreq.valid && dresp.addr_ok) begin
-            //     dreq.valid <= 1'b0;
-            //     ireq_sent <= 1'b0;
-            //     dreq_sent <= 1'b0;
-            // end
-            // if (ireq.valid && iresp.addr_ok) begin
-            //     ireq.valid <= 1'b0;
-            //     ireq_sent <= 1'b0;
-            //     ireq_sent <= 1'b0;
-            // end
-
-
 
             case (state)
                 IDLE: begin
@@ -145,85 +165,13 @@ module mmu
                 
                 FINISH: begin
                     paddr_reg <= {8'b0, pte_reg[2][53:10], vaddr_reg[11:0]};
-                    // 关键修改4: 确保翻译后请求正确发出
-                    // if(~ireq_sent & is_fetch)begin 
-                    //     ireq <= '{valid: 1'b1, addr: paddr_reg};
-                    //     ireq_sent <= 1'b1;
-                    // end
-                    // if(~dreq_sent & ~is_fetch)begin 
-                    //     dreq <= '{
-                    //         valid: 1'b1,
-                    //         addr: paddr_reg,
-                    //         data: mmu_dreq.data,
-                    //         size: mmu_dreq.size,
-                    //         strobe: mmu_dreq.strobe
-                    //     };
-                    //     dreq_sent <= 1'b1;
-                    // end
-
-
-
                 end
                 default: begin end
             endcase
         end
-    end
+    end    
 
-    // cbus request management
-    always_comb begin
-        dreq = '0;
-        ireq = '0;
-        ireq_sent = 1'b0;
-        dreq_sent = 1'b0;
-        if (dreq.valid && dresp.addr_ok) begin
-            dreq.valid = 1'b0;
-            ireq_sent = 1'b0;
-            dreq_sent = 1'b0;
-        end
-        if (ireq.valid && iresp.addr_ok) begin
-            ireq.valid = 1'b0;
-            ireq_sent = 1'b0;
-            ireq_sent = 1'b0;
-        end
-        if (m_mode_direct) begin
-            // 指令请求直连
-            if (mmu_ireq.valid & ~ireq.valid & ~ireq_sent) begin
-                ireq = '{valid: 1'b1, addr: mmu_ireq.addr};
-                ireq_sent = 1'b1;
-            end
-            
-            // 数据请求直连
-            if (mmu_dreq.valid & ~dreq.valid & ~dreq_sent) begin
-                dreq = mmu_dreq;
-                dreq_sent = 1'b1;
-            end
-        end
-        case (state)
-            LEVEL1, LEVEL2, LEVEL3: begin
-                dreq = '{valid: 1'b1, addr: pte_addr_reg, data: mmu_dreq.data, size: MSIZE8, strobe: '1};
-            end
-            FINISH: begin
-                if(~ireq_sent & is_fetch)begin 
-                    ireq = '{valid: 1'b1, addr: paddr_reg};
-                    ireq_sent = 1'b1;
-                end
-                if(~dreq_sent & ~is_fetch)begin 
-                    dreq = '{
-                        valid: 1'b1,
-                        addr: paddr_reg,
-                        data: mmu_dreq.data,
-                        size: mmu_dreq.size,
-                        strobe: mmu_dreq.strobe
-                    };
-                    dreq_sent = 1'b1;
-                end
-            end
-            default: begin end
-        endcase
-    end
-    
-
-    // 关键修改5: 重构状态机转换条件
+    // state machine next state logic
     always_comb begin
         state_next = state;
         case (state)
@@ -232,30 +180,18 @@ module mmu
             
             LEVEL1: begin
                 if (dresp.data_ok) begin
-                    // if (~pte_reg[0][0]) state_next = IDLE; // Invalid PTE
-                    // else if (pte_reg[0][1] | pte_reg[0][3] | pte_reg[0][4]) // Leaf?
-                    //     state_next = FINISH;
-                    // else state_next = LEVEL2;
-
                     state_next = LEVEL2;
                 end
             end
             
             LEVEL2: begin
                 if (dresp.data_ok) begin
-                    // if (~pte_reg[1][0]) state_next = IDLE;
-                    // else if (pte_reg[1][1] | pte_reg[1][3] | pte_reg[1][4])
-                    //     state_next = FINISH;
-                    // else state_next = LEVEL3;
-
                     state_next = LEVEL3;
                 end
             end
             
             LEVEL3: begin
                 if (dresp.data_ok) begin
-                    // if (~pte_reg[2][0]) state_next = IDLE;
-                    // else state_next = FINISH;
                     state_next = FINISH;
                 end
             end
@@ -269,24 +205,7 @@ module mmu
         endcase
     end
 
-    // // 关键修改6: 重构M模式直连处理
-    // always_ff@(posedge clk) begin
-    //     if (m_mode_direct) begin
-    //         // 指令请求直连
-    //         if (mmu_ireq.valid & ~ireq.valid & ~ireq_sent) begin
-    //             ireq <= '{valid: 1'b1, addr: mmu_ireq.addr};
-    //             ireq_sent <= 1'b1;
-    //         end
-            
-    //         // 数据请求直连
-    //         if (mmu_dreq.valid & ~dreq.valid & ~dreq_sent) begin
-    //             dreq <= mmu_dreq;
-    //             dreq_sent <= 1'b1;
-    //         end
-    //     end
-    // end
-
-    // 关键修改7: 权限检查与故障生成
+    // error detection
     u1 is_write;
     u1 perm_err;
     always_comb begin
