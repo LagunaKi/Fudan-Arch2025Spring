@@ -57,7 +57,7 @@ module core
     ibus_resp_t mmu_iresp;
 
     u2 privilege_mode;
-    u2 privilege_mode_reg;
+    u2 privilege_mode_nxt;
 
     assign stallpc = mmu_ireq.valid & (~mmu_iresp.data_ok);
 	assign stalldata = mmu_dreq.valid & (~mmu_dresp.data_ok);
@@ -156,7 +156,8 @@ module core
 		.pc_selected(pc_nxt),
 		.stall, .bubble, .flush, 
 		.op(op_out), .offset,
-		.mepc(csr_regfile.csr_nxt[CSR_MEPC])  // Connect MEPC from CSR
+		.mepc(csr_regfile.csr_nxt[CSR_MEPC]),  // Connect MEPC from CSR
+        .mtvec(csr_regfile.csr_nxt[CSR_MTVEC]) // Connect MTVEC from CSR
 	);
 
 
@@ -199,7 +200,8 @@ module core
         .clk            (clk),
         .reset          (reset),
         .dataD          (dataD_nxt),
-        .dataE          (dataE)
+        .dataE          (dataE),
+        .privilege_mode (privilege_mode)
     );
 
     reg_EM reg_EM (
@@ -209,23 +211,29 @@ module core
 		.last_dataE     (dataE_nxt)
     );
 
-    
-    // assign privilege_mode = (csr_regfile.csr_nxt[CSR_MSTATUS][12:11] == 2'b11) ? PRIVILEGE_M_MODE :
-    //                            (csr_regfile.csr_nxt[CSR_MSTATUS][12:11] == 2'b01) ? PRIVILEGE_S_MODE :
-    //                            PRIVILEGE_U_MODE;
-
-    always_ff@(posedge clk) begin
+    always_comb begin
+        privilege_mode_nxt = privilege_mode;
         if(reset)begin
-            privilege_mode_reg <= PRIVILEGE_M_MODE;
+            privilege_mode_nxt = PRIVILEGE_M_MODE;
         end
-        else if(dataW.ctl.is_mret || dataW.ctl.is_ecall)begin
-            privilege_mode_reg <= (csr_regfile.csr_nxt[CSR_MSTATUS][12:11] == 2'b11) ? PRIVILEGE_M_MODE :
+        else if(dataW.ctl.is_mret)begin
+            privilege_mode_nxt = (csr_regfile.csr_nxt[CSR_MSTATUS][12:11] == 2'b11) ? PRIVILEGE_M_MODE :
                                 (csr_regfile.csr_nxt[CSR_MSTATUS][12:11] == 2'b01) ? PRIVILEGE_S_MODE :
                                 PRIVILEGE_U_MODE;
         end
+        else if(dataW.ctl.is_ecall)begin
+            privilege_mode_nxt = PRIVILEGE_M_MODE;
+        end
     end
 
-    assign privilege_mode = privilege_mode_reg;
+    always_ff @(posedge clk) begin
+        if (reset) begin
+            privilege_mode <= PRIVILEGE_M_MODE;
+        end 
+		else begin
+            privilege_mode <= privilege_mode_nxt;
+        end
+    end
 
     mmu mmu (
         .clk            (clk),
@@ -252,18 +260,18 @@ module core
         .mmu_page_fault(mmu_page_fault) // MMU page fault signal
     );
 
-    always_comb begin
-        // Default assignments
-        dataM.exception = 1'b0;
-        dataM.cause = '0;
-        dataM.tval = '0;
+    // always_comb begin
+    //     // Default assignments
+    //     dataM.exception = 1'b0;
+    //     dataM.cause = '0;
+    //     dataM.tval = '0;
         
-        if (mmu_page_fault) begin
-            dataM.exception = 1'b1;
-            dataM.cause = dataE_nxt.ctl.memwrite ? STORE_PAGE_FAULT : LOAD_PAGE_FAULT;
-            dataM.tval = dataE_nxt.mem_addr;
-        end
-    end
+    //     if (mmu_page_fault) begin
+    //         dataM.exception = 1'b1;
+    //         dataM.cause = dataE_nxt.ctl.memwrite ? STORE_PAGE_FAULT : LOAD_PAGE_FAULT;
+    //         dataM.tval = dataE_nxt.mem_addr;
+    //     end
+    // end
 
     reg_MW reg_MW (
         .clk, .reset, .stalldata, .flush, 
@@ -370,7 +378,7 @@ module core
 	DifftestCSRState DifftestCSRState(
 		.clock              (clk),
 		.coreid             (csr_regfile.csr_nxt[CSR_MHARTID][7:0]),
-		.priviledgeMode     (privilege_mode),
+		.priviledgeMode     (privilege_mode_nxt),
 		.mstatus            (csr_regfile.csr_nxt[CSR_MSTATUS] & MSTATUS_MASK),
 		.sstatus            (csr_regfile.csr_nxt[CSR_SSTATUS] & SSTATUS_MASK), // SSTATUS_MASK defined in include/common.sv
 		.mepc               (csr_regfile.csr_nxt[CSR_MEPC]),

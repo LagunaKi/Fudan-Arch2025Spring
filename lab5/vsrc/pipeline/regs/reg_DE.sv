@@ -25,7 +25,6 @@ import common::*;
             dataD_out.ctl.regwrite <= '0;
             dataD_out.ctl.csr_ops <= '0;
             dataD_out.dst        <= '0;
-            dataD_out.csr_addr   <= '0;
             dataD_out.pc         <= 64'h8000_0000;
             dataD_out.stall <= 1'b1;
         end
@@ -40,7 +39,6 @@ import common::*;
             dataD_out.ctl.regwrite <= '0;
             dataD_out.ctl.csr_ops <= '0;
             dataD_out.dst        <= '0;
-            dataD_out.csr_addr   <= '0;
             dataD_out.pc         <= 64'h8000_0000;
             dataD_out.stall <= 1'b1;
         end
@@ -57,7 +55,6 @@ import common::*;
             dataD_out.ctl.regwrite <= '0;
             dataD_out.ctl.csr_ops <= '0;
             dataD_out.dst        <= '0;
-            dataD_out.csr_addr   <= '0;
             dataD_out.pc         <= 64'h8000_0000;
             dataD_out.stall <= 1'b1;
         end

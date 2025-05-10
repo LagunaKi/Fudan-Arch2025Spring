@@ -12,17 +12,16 @@ module execute
 (
     input logic clk, reset,
     input decode_data_t dataD,
+    input u2 privilege_mode,
     output execute_data_t dataE
 
 );
     u64 result;
     word_t alu_a, alu_b;
     assign dataE.pc = dataD.pc;
-    assign dataE.ctl = dataD.ctl;
     assign dataE.dst = dataD.dst;
     assign dataE.mem_addr = dataD.mem_addr;
     assign dataE.stall = dataD.stall;
-    assign dataE.csr_addr = dataD.csr_addr;
 
     always_comb begin
         alu_a = '0;
@@ -245,11 +244,10 @@ module execute
     );
 
     always_comb begin
+        dataE.ctl = dataD.ctl;
         unique case(dataD.ctl.op)
             MRET:begin
-                // Set MRET operation flag
-                // dataE.ctl.is_mret = 1'b1;
-                
+                dataE.ctl.csr_ops = '0;
                 // Operation 0: Update mstatus (no mepc write needed)
                 dataE.ctl.csr_ops[0].addr = CSR_MSTATUS;
                 dataE.ctl.csr_ops[0].data = dataD.csr_data;
@@ -264,9 +262,7 @@ module execute
                 dataE.result = '0;
             end
             ECALL:begin
-                // Set ECALL operation flag
-                // dataE.ctl.is_ecall = 1'b1;
-                
+                dataE.ctl.csr_ops = '0;
                 // Operation 0: Write mepc (current PC)
                 dataE.ctl.csr_ops[0].addr = CSR_MEPC;
                 dataE.ctl.csr_ops[0].data = dataD.pc;
@@ -275,8 +271,8 @@ module execute
                 // Operation 1: Update mstatus
                 dataE.ctl.csr_ops[1].addr = CSR_MSTATUS;
                 dataE.ctl.csr_ops[1].data = dataD.csr_data;
-                // MPP = 11 (M-mode)
-                dataE.ctl.csr_ops[1].data[12:11] = 2'b11;
+                // MPP
+                dataE.ctl.csr_ops[1].data[12:11] = privilege_mode;
                 // MPIE = MIE
                 dataE.ctl.csr_ops[1].data[7] = dataD.csr_data[3];
                 // MIE = 0
@@ -285,7 +281,12 @@ module execute
                 
                 // Operation 2: Write mcause (exception cause)
                 dataE.ctl.csr_ops[2].addr = CSR_MCAUSE;
-                dataE.ctl.csr_ops[2].data = 64'd00; // ECALL from U-mode
+                case (privilege_mode)
+                    2'b00: dataE.ctl.csr_ops[2].data = 64'h8; // U-mode ECALL
+                    2'b01: dataE.ctl.csr_ops[2].data = 64'h9; // S-mode ECALL
+                    2'b11: dataE.ctl.csr_ops[2].data = 64'hB; // M-mode ECALL
+                    default: dataE.ctl.csr_ops[2].data = 64'hB;
+                endcase
                 dataE.ctl.csr_ops[2].we = 1'b1;
                 
                 dataE.result = '0;

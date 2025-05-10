@@ -23,7 +23,6 @@ module reg_EM
             dataE_out.ctl.csr_ops <= '0;
             dataE_out.dst <= '0;
             dataE_out.mem_addr <= '0;
-            dataE_out.csr_addr <= '0;
             dataE_out.stall <= 1'b1;
         end
         else if(flush) begin
@@ -36,7 +35,6 @@ module reg_EM
             dataE_out.ctl.csr_ops <= '0;
             dataE_out.dst <= '0;
             dataE_out.mem_addr <= '0;
-            dataE_out.csr_addr <= '0;
             dataE_out.stall <= 1'b1;
         end
         else if(stalldata)begin

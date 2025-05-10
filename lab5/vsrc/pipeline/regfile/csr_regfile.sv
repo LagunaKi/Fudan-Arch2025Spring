@@ -1,5 +1,3 @@
-`ifndef CSR_REGFILE_SV
-`define CSR_REGFILE_SV
 
 `ifdef VERILATOR
 `include "include/common.sv"
@@ -75,4 +73,3 @@ module csr_regfile
     end
 
 endmodule
-`endif

@@ -195,6 +195,9 @@ module decode
             MRET:begin
                 op = F_MRET;
             end
+            ECALL:begin
+                op = F_ECALL;
+            end
             default:begin
                 op = PLUS4; 
             end
@@ -211,7 +214,7 @@ module decode
             dataD.csr_data = csr_rd;
             csr_ra = dataF.raw_instr[31:20];
         end
-        else if (ctl.op inside {MRET}) begin
+        else if (ctl.op inside {MRET, ECALL}) begin
             csr_ra = CSR_MSTATUS;
             dataD.csr_data = csr_rd;
         end

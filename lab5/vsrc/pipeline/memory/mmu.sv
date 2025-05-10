@@ -1,10 +1,12 @@
-`ifndef MMU_SV
-`define MMU_SV
-
+// `ifndef MMU_SV
+// `define MMU_SV
+`ifdef VERILATOR
 `include "include/common.sv"
 `include "include/config.sv"
 `include "include/csr.sv"
+`else
 
+`endif
 module mmu 
     import common::*;
     import config_pkg::*;
@@ -218,17 +220,26 @@ module mmu
                 if (dresp.data_ok) begin
                     state_next = LEVEL2;
                 end
+                if (m_mode_direct) begin
+                    state_next = IDLE;
+                end
             end
             
             LEVEL2: begin
                 if (dresp.data_ok) begin
                     state_next = LEVEL3;
                 end
+                if (m_mode_direct) begin
+                    state_next = IDLE;
+                end
             end
             
             LEVEL3: begin
                 if (dresp.data_ok) begin
                     state_next = FINISH;
+                end
+                if (m_mode_direct) begin
+                    state_next = IDLE;
                 end
             end
             
@@ -267,4 +278,4 @@ module mmu
 
 endmodule
 
-`endif
+// `endif

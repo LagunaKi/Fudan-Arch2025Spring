@@ -24,7 +24,6 @@ module reg_MW
             dataM_out.ctl.csr_ops <= '0;
             dataM_out.dst <= '0;
             dataM_out.mem_addr <= '0;
-            dataM_out.csr_addr <= '0;
             dataM_out.stall <= 1'b1;
             dataM_out.exception <= '0;
             dataM_out.cause <= '0;
@@ -40,7 +39,6 @@ module reg_MW
             dataM_out.ctl.csr_ops <= '0;
             dataM_out.dst <= '0;
             dataM_out.mem_addr <= '0;
-            dataM_out.csr_addr <= '0;
             dataM_out.stall <= 1'b1;
             dataM_out.exception <= '0;
             dataM_out.cause <= '0;
@@ -51,7 +49,6 @@ module reg_MW
             dataM_out.pc <= last_dataM.pc;
             dataM_out.ctl <= last_dataM.ctl;
             dataM_out.dst <= last_dataM.dst;
-            dataM_out.csr_addr <= last_dataM.csr_addr;
             dataM_out.stall <= 1'b1;
             dataM_out.exception <= last_dataM.exception;
             dataM_out.cause <= last_dataM.cause;

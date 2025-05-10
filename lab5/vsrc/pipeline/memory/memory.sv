@@ -21,7 +21,6 @@ module memory
     assign dataM.cause = dataE.ctl.memwrite ? STORE_PAGE_FAULT : LOAD_PAGE_FAULT;
     assign dataM.tval = dataE.mem_addr;
     assign dataM.stall = dataE.stall;
-    assign dataM.csr_addr = dataE.csr_addr;
     
     // Handle MMU page faults - now handled directly through mmu_page_fault input
 

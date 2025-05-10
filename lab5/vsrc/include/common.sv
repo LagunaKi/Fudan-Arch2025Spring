@@ -209,12 +209,12 @@ parameter PRIVILEGE_M_MODE = 2'b11;
 parameter LOAD_PAGE_FAULT = 13;
 parameter STORE_PAGE_FAULT = 15;
 
-parameter u64 MSTATUS_MASK = 64'h7e79bb;
-parameter u64 SSTATUS_MASK = 64'h800000030001e000;
-parameter u64 MIP_MASK = 64'h333;
-parameter u64 MTVEC_MASK = ~(64'h2);
-parameter u64 MEDELEG_MASK = 64'h0;
-parameter u64 MIDELEG_MASK = 64'h0;
+// parameter u64 MSTATUS_MASK = 64'h7e79bb;
+// parameter u64 SSTATUS_MASK = 64'h800000030001e000;
+// parameter u64 MIP_MASK = 64'h333;
+// parameter u64 MTVEC_MASK = ~(64'h2);
+// parameter u64 MEDELEG_MASK = 64'h0;
+// parameter u64 MIDELEG_MASK = 64'h0;
 // number of bytes transferred in one memory r/w
 typedef enum i3 {
     MSIZE1 = 3'b000,
@@ -374,7 +374,7 @@ typedef enum logic [1:0] {
 } instr_FETCH_t;
 
 typedef enum logic [4:0] {
-	MAINTAIN, PLUS4, F_BEQ, N_BEQ, F_JAL, F_JALR, F_MRET
+	MAINTAIN, PLUS4, F_BEQ, N_BEQ, F_JAL, F_JALR, F_MRET, F_ECALL
 } instfunc_t;
 
 typedef struct packed {
@@ -412,7 +412,6 @@ typedef struct packed {
 	word_t mem_addr;
 	u64 pc;
 	u1 stall;
-	csr_addr_t csr_addr;  // CSR register address
 } decode_data_t;
 
 typedef struct packed {
@@ -422,7 +421,6 @@ typedef struct packed {
 	creg_addr_t dst;
 	word_t mem_addr;
 	u1 stall;
-	csr_addr_t csr_addr;  // CSR register address
 } execute_data_t;
 
 typedef struct packed {
@@ -432,7 +430,6 @@ typedef struct packed {
     creg_addr_t dst;
     word_t mem_addr;
     u1 stall;
-    csr_addr_t csr_addr;  // CSR register address
     u1 exception;         // Exception occurred
     u32 cause;           // Exception cause code
     u64 tval;            // Exception additional info
@@ -445,7 +442,6 @@ typedef struct packed {
     creg_addr_t dst;
     word_t mem_addr;
     u1 stall;
-    csr_addr_t csr_addr;  // CSR register address
 } writeback_data_t;
 
 

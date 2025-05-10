@@ -19,7 +19,8 @@ module pcselect
     input u1 flush,  // Pipeline flush signal
     input instfunc_t op,
     input u64 offset,
-    input u64 mepc    // MEPC value from CSR
+    input u64 mepc,    // MEPC value from CSR
+    input u64 mtvec
 );
 always_comb begin
     if(flush) begin
@@ -38,8 +39,11 @@ always_comb begin
     else if(ireq.valid == 0 && op == F_JALR)begin
         pc_selected = offset;
     end
-    else if(ireq.valid == 0 && op == F_MRET)begin
+    else if(ireq.valid == 0 && (op == F_MRET ))begin
         pc_selected = mepc;  // Restore PC from MEPC
+    end
+    else if(ireq.valid == 0 && op == F_ECALL) begin
+        pc_selected = mtvec;
     end
     else if(ireq.valid == 0 )begin
         pc_selected = pc;  
