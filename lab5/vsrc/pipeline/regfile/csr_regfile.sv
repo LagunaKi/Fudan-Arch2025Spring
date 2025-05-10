@@ -1,4 +1,3 @@
-
 `ifdef VERILATOR
 `include "include/common.sv"
 `include "include/csr.sv"
@@ -16,59 +15,119 @@ module csr_regfile
     output word_t rd
 );
 
-    word_t csr[2**12] /* verilator public_flat_rd */;
-    word_t csr_nxt[2**12] /* verilator public_flat_rd */;
+    word_t mstatus, mstatus_nxt;
+    word_t sstatus, sstatus_nxt;
+    word_t mip, mip_nxt;
+    word_t mie, mie_nxt;
+    word_t mtvec, mtvec_nxt;
+    word_t mepc, mepc_nxt;
+    word_t mcause, mcause_nxt;
+    word_t mtval, mtval_nxt;
+    word_t mscratch, mscratch_nxt;
+    word_t mhartid;     // 恒定值
+    word_t mcycle, mcycle_nxt;
+    word_t satp, satp_nxt;
 
-    assign rd = csr[ra];
+    const word_t UNDEFINED_CSR = '0;
 
-    // Initialize CSR registers
-    initial begin
-        for(int i = 0; i < 2**12; i++) begin
-            csr[i] = '0;
-            csr_nxt[i] = '0;
-        end
+    always_comb begin
+        unique case(ra)
+            CSR_MSTATUS:  rd = mstatus;
+            CSR_SSTATUS:  rd = sstatus;
+            CSR_MIP:      rd = mip;
+            CSR_MIE:      rd = mie;
+            CSR_MTVEC:    rd = mtvec;
+            CSR_MEPC:     rd = mepc;
+            CSR_MCAUSE:   rd = mcause;
+            CSR_MTVAL:    rd = mtval;
+            CSR_MSCRATCH: rd = mscratch;
+            CSR_MHARTID:  rd = mhartid;
+            CSR_MCYCLE:   rd = mcycle;
+            CSR_SATP:     rd = satp;
+            default: begin
+                rd = UNDEFINED_CSR;
+            end
+        endcase
     end
 
     // Write logic - combinational
     always_comb begin
-        for(int i = 0; i < 2**12; i++) begin
-            csr_nxt[i] = csr[i];  // Capture current state
-        end
+        // 默认保持当前值
+        mstatus_nxt = mstatus;
+        sstatus_nxt = sstatus;
+        mip_nxt = mip;
+        mie_nxt = mie;
+        mtvec_nxt = mtvec;
+        mepc_nxt = mepc;
+        mcause_nxt = mcause;
+        mtval_nxt = mtval;
+        satp_nxt = satp;
         
         // Multi-register write
-        for (int i = 0; i < 3; i++) begin
+        for (int i = 2; i >= 0; i--) begin
             if (csr_ops[i].we) begin
                 case(csr_ops[i].addr)
-                    CSR_MSTATUS: csr_nxt[csr_ops[i].addr] = (csr[csr_ops[i].addr] & ~MSTATUS_MASK) | (csr_ops[i].data & MSTATUS_MASK);
-                    CSR_SSTATUS: csr_nxt[csr_ops[i].addr] = (csr[csr_ops[i].addr] & ~SSTATUS_MASK) | (csr_ops[i].data & SSTATUS_MASK);
-                    CSR_MIP:     csr_nxt[csr_ops[i].addr] = (csr[csr_ops[i].addr] & ~MIP_MASK) | (csr_ops[i].data & MIP_MASK);
-                    CSR_MTVEC:   csr_nxt[csr_ops[i].addr] = (csr[csr_ops[i].addr] & ~MTVEC_MASK) | (csr_ops[i].data & MTVEC_MASK);
-                    default:      csr_nxt[csr_ops[i].addr] = csr_ops[i].data;
+                    CSR_MSTATUS: begin
+                        mstatus_nxt = (mstatus & ~MSTATUS_MASK) |
+                                     (csr_ops[i].data & MSTATUS_MASK);
+                    end
+                    CSR_SSTATUS: begin
+                        sstatus_nxt = (sstatus & ~SSTATUS_MASK) |
+                                     (csr_ops[i].data & SSTATUS_MASK);
+                    end
+                    CSR_MIP: begin
+                        mip_nxt = (mip & ~MIP_MASK) |
+                                 (csr_ops[i].data & MIP_MASK);
+                    end
+                    CSR_MIE: begin
+                        mie_nxt = csr_ops[i].data; // 无掩码
+                    end
+                    CSR_MTVEC: begin
+                        mtvec_nxt = (mtvec & ~MTVEC_MASK) |
+                                   (csr_ops[i].data & MTVEC_MASK);
+                    end
+                    CSR_MEPC:    mepc_nxt = csr_ops[i].data;
+                    CSR_MCAUSE:  mcause_nxt = csr_ops[i].data;
+                    CSR_MTVAL:   mtval_nxt = csr_ops[i].data;
+                    CSR_MSCRATCH:mscratch_nxt = csr_ops[i].data;
+                    CSR_MCYCLE:  mcycle_nxt = csr_ops[i].data;
+                    CSR_SATP:    satp_nxt = csr_ops[i].data;
+                    default: ;
                 endcase
             end
         end
         
         // mcycle increments every cycle
-        csr_nxt[CSR_MCYCLE] = csr[CSR_MCYCLE] + 1;
-        csr_nxt[CSR_MHARTID] = '0;
+        mcycle_nxt = mcycle + 64'd1;
+        mhartid = '0;
     end
 
     // Update registers on clock edge
     always_ff @(posedge clk) begin
-        if(reset) begin
-            csr[CSR_MSTATUS] <= {64{1'b0}};  // Initialize all bits to 0
-            // csr[CSR_MSTATUS][12:11] <= 2'b11;  // Set mpp to M mode (3)
-            csr[CSR_MTVEC] <= '0;
-            csr[CSR_MIP] <= '0;
-            csr[CSR_MIE] <= '0;
-            csr[CSR_MSCRATCH] <= '0;
-            csr[CSR_MCAUSE] <= '0;
-            csr[CSR_MTVAL] <= '0;
-            csr[CSR_MEPC] <= '0;
-            csr[CSR_MCYCLE] <= '0;
-            csr[CSR_SATP] <= '0;
+        if (reset) begin
+            mstatus <= '0;
+            sstatus <= '0;
+            mip <= '0;
+            mie <= '0;
+            mtvec <= '0;
+            mepc <= '0;
+            mcause <= '0;
+            mtval <= '0;
+            mscratch <= '0;
+            mcycle <= '0;
+            satp <= '0;
         end else begin
-            csr <= csr_nxt;
+            mstatus <= mstatus_nxt;
+            sstatus <= sstatus_nxt;
+            mip <= mip_nxt;
+            mie <= mie_nxt;
+            mtvec <= mtvec_nxt;
+            mepc <= mepc_nxt;
+            mcause <= mcause_nxt;
+            mtval <= mtval_nxt;
+            mcycle <= mcycle_nxt;
+            satp <= satp_nxt;
+            mscratch <= mscratch_nxt;
         end
     end
 

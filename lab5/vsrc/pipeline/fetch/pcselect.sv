@@ -36,31 +36,19 @@ always_comb begin
     else if( (op == F_BEQ ||op == F_JAL ) )begin
         pc_selected = pc + offset;
     end
-    else if(ireq.valid == 0 && op == F_JALR)begin
+    else if(op == F_JALR)begin
         pc_selected = offset;
     end
-    else if(ireq.valid == 0 && (op == F_MRET ))begin
+    else if((op == F_MRET ))begin
         pc_selected = mepc;  // Restore PC from MEPC
     end
-    else if(ireq.valid == 0 && op == F_ECALL) begin
+    else if(op == F_ECALL) begin
         pc_selected = mtvec;
-    end
-    else if(ireq.valid == 0 )begin
-        pc_selected = pc;  
     end
     else begin
         unique case (op)
             MAINTAIN:begin
                 pc_selected = pc;
-            end
-            F_BEQ:begin
-                pc_selected = pc + offset;
-            end
-            F_JAL:begin
-                pc_selected = pc + offset;
-            end
-            F_JALR:begin
-                pc_selected = offset;
             end
             default: begin
                 pc_selected = pc + 4; 

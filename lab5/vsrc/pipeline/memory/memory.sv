@@ -210,6 +210,8 @@ module memory
     end
 
     always_comb begin
+		readdata = '0;
+        
 		unique case(msize)
 			MSIZE1: begin 
 				unique case(dataE.mem_addr[2:0])

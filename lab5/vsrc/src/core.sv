@@ -156,8 +156,8 @@ module core
 		.pc_selected(pc_nxt),
 		.stall, .bubble, .flush, 
 		.op(op_out), .offset,
-		.mepc(csr_regfile.csr_nxt[CSR_MEPC]),  // Connect MEPC from CSR
-        .mtvec(csr_regfile.csr_nxt[CSR_MTVEC]) // Connect MTVEC from CSR
+		.mepc(csr_regfile.mepc_nxt),  // Connect MEPC from CSR
+        .mtvec(csr_regfile.mtvec_nxt) // Connect MTVEC from CSR
 	);
 
 
@@ -216,9 +216,9 @@ module core
         if(reset)begin
             privilege_mode_nxt = PRIVILEGE_M_MODE;
         end
-        else if(dataW.ctl.is_mret)begin
-            privilege_mode_nxt = (csr_regfile.csr_nxt[CSR_MSTATUS][12:11] == 2'b11) ? PRIVILEGE_M_MODE :
-                                (csr_regfile.csr_nxt[CSR_MSTATUS][12:11] == 2'b01) ? PRIVILEGE_S_MODE :
+        else if(dataW.ctl.is_mret & ~stallpc)begin //prevent m_mode ireq handled in u_mode
+            privilege_mode_nxt = (csr_regfile.mstatus_nxt[12:11] == 2'b11) ? PRIVILEGE_M_MODE :
+                                (csr_regfile.mstatus_nxt[12:11] == 2'b01) ? PRIVILEGE_S_MODE :
                                 PRIVILEGE_U_MODE;
         end
         else if(dataW.ctl.is_ecall)begin
@@ -239,7 +239,7 @@ module core
         .clk            (clk),
         .reset          (reset),
         .privilege_mode (privilege_mode),
-        .satp           (csr_regfile.csr_nxt[CSR_SATP]),
+        .satp           (csr_regfile.satp_nxt),
         .dreq           (dreq),
         .mmu_dreq       (mmu_dreq),
         .ireq           (ireq),
@@ -315,7 +315,7 @@ module core
 `ifdef VERILATOR
 	DifftestInstrCommit DifftestInstrCommit(
 		.clock              (clk),
-		.coreid             (csr_regfile.csr_nxt[CSR_MHARTID][7:0]),
+		.coreid             (csr_regfile.mhartid[7:0]),
 		.index              (0),
 		.valid              (handin),
 		.pc                 (dataW.pc),
@@ -330,7 +330,7 @@ module core
 	      
 	DifftestArchIntRegState DifftestArchIntRegState (
 		.clock              (clk),
-		.coreid             (csr_regfile.csr_nxt[CSR_MHARTID][7:0]),
+		.coreid             (csr_regfile.mhartid[7:0]),
 		.gpr_0              (regfile.regs_nxt[0]),
 		.gpr_1              (regfile.regs_nxt[1]),
 		.gpr_2              (regfile.regs_nxt[2]),
@@ -367,7 +367,7 @@ module core
 
     DifftestTrapEvent DifftestTrapEvent(
 		.clock              (clk),
-		.coreid             (csr_regfile.csr_nxt[CSR_MHARTID][7:0]),
+		.coreid             (csr_regfile.mhartid[7:0]),
 		.valid              (0),
 		.code               (0),
 		.pc                 (0),
@@ -377,22 +377,22 @@ module core
 
 	DifftestCSRState DifftestCSRState(
 		.clock              (clk),
-		.coreid             (csr_regfile.csr_nxt[CSR_MHARTID][7:0]),
+		.coreid             (csr_regfile.mhartid[7:0]),
 		.priviledgeMode     (privilege_mode_nxt),
-		.mstatus            (csr_regfile.csr_nxt[CSR_MSTATUS] & MSTATUS_MASK),
-		.sstatus            (csr_regfile.csr_nxt[CSR_SSTATUS] & SSTATUS_MASK), // SSTATUS_MASK defined in include/common.sv
-		.mepc               (csr_regfile.csr_nxt[CSR_MEPC]),
+		.mstatus            (csr_regfile.mstatus_nxt & MSTATUS_MASK),
+		.sstatus            (csr_regfile.sstatus_nxt & SSTATUS_MASK),
+		.mepc               (csr_regfile.mepc_nxt),
 		.sepc               (0),
-		.mtval              (csr_regfile.csr_nxt[CSR_MTVAL]),
+		.mtval              (csr_regfile.mtval_nxt),
 		.stval              (0),
-		.mtvec              (csr_regfile.csr_nxt[CSR_MTVEC] & MTVEC_MASK),
+		.mtvec              (csr_regfile.mtvec_nxt & MTVEC_MASK),
 		.stvec              (0),
-		.mcause             (csr_regfile.csr_nxt[CSR_MCAUSE]),
+		.mcause             (csr_regfile.mcause_nxt),
 		.scause             (0),
-		.satp               (csr_regfile.csr_nxt[CSR_SATP]),
-		.mip                (csr_regfile.csr_nxt[CSR_MIP] & MIP_MASK),
-		.mie                (csr_regfile.csr_nxt[CSR_MIE]),
-		.mscratch           (csr_regfile.csr_nxt[CSR_MSCRATCH]),
+		.satp               (csr_regfile.satp_nxt),
+		.mip                (csr_regfile.mip_nxt & MIP_MASK),
+		.mie                (csr_regfile.mie_nxt),
+		.mscratch           (csr_regfile.mscratch_nxt),
 		.sscratch           (0),
 		.mideleg            (0),
 		.medeleg            (0)

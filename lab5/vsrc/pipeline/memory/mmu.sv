@@ -62,17 +62,18 @@ module mmu
             mmu_dresp = 0;
             mmu_iresp = 0;
             if (state == FINISH) begin
-                if (is_fetch) begin
+                if (is_fetch & iresp.data_ok) begin
                     mmu_iresp = iresp;
-                end else begin
+                end
+                else if (dresp.data_ok) begin
                     mmu_dresp = dresp;
                 end
             end
         end
         else begin
             // M模式透传
-            mmu_iresp = iresp;
-            mmu_dresp = dresp;
+            mmu_iresp = iresp.data_ok? iresp : 0;
+            mmu_dresp = dresp.data_ok ? dresp : 0;
         end
     end
 

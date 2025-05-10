@@ -37,6 +37,4 @@ module regfile
 		end
 	end
 		
-	
-
 endmodule
